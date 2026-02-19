@@ -1,0 +1,15 @@
+{
+  "name": "ระบบจัดการบิล พมจ.แพร่",
+  "short_name": "พมจ.แพร่",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1d4ed8",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1043/1043431.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
