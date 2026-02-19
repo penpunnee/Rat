@@ -3,131 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suda Lottery - Sweet Pastel (Rate 500)</title>
+    <title>Suda Lottery - Multi-Bill System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap');
-        body { font-family: 'Kanit', sans-serif; background: #fdfbfb; background-image: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%); }
-        .pastel-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 2.5rem; border: 1px solid #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
-        .type-btn-active { background: #6366f1 !important; color: white !important; transform: scale(1.05); }
-        .pastel-header { background: linear-gradient(135deg, #a5b4fc 0%, #fbcfe8 100%); }
-        #bill-capture { width: 420px; background: white; padding: 40px; border-radius: 40px; }
+        body { font-family: 'Kanit', sans-serif; background: #fdfbfb; }
+        .pastel-card { background: white; border-radius: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .type-btn-active { background: #6366f1 !important; color: white !important; }
+        .tab-active { border-bottom: 4px solid #6366f1; color: #6366f1; }
+        #bill-capture-1, #bill-capture-2 { width: 400px; background: white; padding: 30px; border-radius: 30px; }
     </style>
 </head>
 <body class="min-h-screen pb-24">
 
-    <div class="pastel-header p-10 rounded-b-[60px] text-white text-center shadow-lg mb-8">
-        <div class="bg-white/30 inline-block p-3 rounded-full mb-3"><i class="fas fa-heart text-2xl"></i></div>
-        <h1 class="text-3xl font-black italic uppercase">SUDA LOTTERY</h1>
-        <p class="text-[10px] tracking-widest font-bold opacity-80 uppercase mt-1">Premium Rate 500 System</p>
+    <div class="flex border-b bg-white sticky top-0 z-50">
+        <button onclick="showPage('page1')" id="tab1" class="flex-1 py-4 font-bold tab-active"><i class="fas fa-edit mr-2"></i>ออกบิล</button>
+        <button onclick="showPage('page2')" id="tab2" class="flex-1 py-4 font-bold text-gray-400"><i class="fas fa-chart-line mr-2"></i>สรุปงวด</button>
     </div>
 
-    <div class="max-w-md mx-auto px-6 space-y-6">
-        
-        <div class="pastel-card p-6">
-            <label class="text-[10px] font-bold text-indigo-400 uppercase flex items-center mb-1">
-                <i class="fas fa-user-tag mr-2"></i> ข้อมูลลูกค้า
-            </label>
-            <input type="text" id="custName" class="w-full border-b-2 border-indigo-50 p-2 outline-none text-lg font-bold transition-all" placeholder="ระบุชื่อลูกค้า...">
+    <div id="page1" class="max-w-md mx-auto px-6 py-8 space-y-6">
+        <div class="pastel-card p-6 border-t-8 border-indigo-400">
+            <label class="text-[10px] font-bold text-indigo-400 uppercase">ชื่อลูกค้า</label>
+            <input type="text" id="custName" class="w-full border-b-2 border-gray-100 p-2 outline-none font-bold text-lg" placeholder="ระบุชื่อ...">
+            
+            <div class="grid grid-cols-12 gap-2 mt-4">
+                <input type="text" id="lotNumber" class="col-span-8 bg-gray-50 p-3 rounded-2xl text-xl font-black outline-none" placeholder="เลข">
+                <button onclick="handleSmartReverse()" class="col-span-4 bg-indigo-500 text-white rounded-2xl font-bold text-xs">สลับชุด</button>
+                
+                <div class="col-span-12 grid grid-cols-3 gap-1 py-2">
+                    <button onclick="setType('บน', this)" class="type-btn p-2 rounded-lg border text-[10px] bg-gray-50" data-val="บน">บน</button>
+                    <button onclick="setType('โต๊ด', this)" class="type-btn p-2 rounded-lg border text-[10px] bg-gray-50" data-val="โต๊ด">โต๊ด</button>
+                    <button onclick="setType('ล่าง', this)" class="type-btn p-2 rounded-lg border text-[10px] bg-gray-50" data-val="ล่าง">ล่าง</button>
+                </div>
+                
+                <input type="number" id="lotPrice" class="col-span-12 bg-pink-50 p-3 rounded-2xl text-xl font-black" placeholder="ราคา">
+            </div>
+            <button onclick="addItem()" class="w-full mt-4 bg-indigo-500 text-white py-4 rounded-2xl font-bold shadow-md active:scale-95 transition-all">เพิ่มรายการ</button>
         </div>
 
-        <div class="pastel-card p-8 border-t-8 border-indigo-200 shadow-xl">
-            <div class="grid grid-cols-12 gap-3">
-                <div class="col-span-12 flex space-x-2 mb-2">
-                    <div class="relative flex-1">
-                        <i class="fas fa-hashtag absolute left-3 top-4 text-indigo-200"></i>
-                        <input type="text" id="lotNumber" class="w-full bg-gray-50 border-2 border-gray-50 p-3 pl-10 rounded-2xl text-2xl font-black outline-none focus:border-indigo-300" placeholder="เลข">
-                    </div>
-                    <button onclick="handleSmartReverse()" class="bg-indigo-500 text-white px-5 rounded-2xl font-bold shadow-md active:scale-90 transition-all text-xs">
-                        สลับชุด
-                    </button>
-                </div>
+        <div id="itemList" class="space-y-3"></div>
 
-                <div class="col-span-12 grid grid-cols-3 gap-2 py-2">
-                    <button onclick="setType('บน', this)" class="type-btn p-2 rounded-xl border-2 text-[10px] font-bold bg-gray-50 text-gray-400" data-val="บน">บน (500)</button>
-                    <button onclick="setType('ล่าง', this)" class="type-btn p-2 rounded-xl border-2 text-[10px] font-bold bg-gray-50 text-gray-400" data-val="ล่าง">ล่าง (60)</button>
-                    <button onclick="setType('บน+ล่าง', this)" class="type-btn p-2 rounded-xl border-2 text-[10px] font-bold bg-gray-50 text-gray-400" data-val="บน+ล่าง">บน+ล่าง</button>
-                    <button onclick="setType('โต๊ด', this)" class="type-btn p-2 rounded-xl border-2 text-[10px] font-bold bg-gray-50 text-gray-400" data-val="โต๊ด">โต๊ด (80)</button>
-                    <button onclick="setType('อั้น', this)" class="type-btn p-2 rounded-xl border-2 text-[10px] font-bold bg-gray-50 text-gray-400" data-val="อั้น">อั้น (30)</button>
-                    <button onclick="setType('ชุดพิเศษ', this)" class="type-btn p-2 rounded-xl border-2 text-[10px] font-bold bg-gray-50 text-gray-400" data-val="ชุดพิเศษ">ชุด</button>
-                </div>
-
-                <div class="col-span-12 relative">
-                    <i class="fas fa-coins absolute left-4 top-4 text-orange-300"></i>
-                    <input type="number" id="lotPrice" class="w-full bg-orange-50 border-2 border-orange-50 p-4 pl-10 rounded-2xl text-2xl font-black text-orange-400 outline-none" placeholder="ราคาต่อตัว">
+        <div class="pastel-card p-8 bg-indigo-900 text-white">
+            <h3 class="font-bold mb-4 border-b border-indigo-800 pb-2">สรุปยอดชำระ</h3>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between opacity-60"><span>ยอดซื้อ:</span><span id="res-total">0.00</span></div>
+                <div class="flex justify-between text-yellow-400"><span>ส่วนลด (27%):</span><span id="res-disc">0.00</span></div>
+                <div class="flex justify-between border-t border-indigo-800 pt-3 text-2xl font-bold">
+                    <span>ยอดสุทธิ:</span><span id="res-net">0.00</span>
                 </div>
             </div>
-            <button onclick="addItem()" class="w-full mt-6 bg-indigo-400 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition-all">
-                <i class="fas fa-plus-circle mr-2"></i> เพิ่มลงบิล
-            </button>
-        </div>
-
-        <div id="itemList" class="space-y-4"></div>
-
-        <div class="pastel-card p-10 bg-white shadow-2xl border-b-8 border-indigo-200">
-            <div class="space-y-4 text-sm font-semibold text-gray-600">
-                <div class="flex justify-between items-center opacity-60">
-                    <span><i class="fas fa-file-invoice mr-2"></i> ยอดซื้อรวม:</span>
-                    <span id="res-total">0.00</span>
-                </div>
-                <div class="flex justify-between items-center text-pink-400">
-                    <span><i class="fas fa-percent mr-2"></i> ส่วนลดคอม (27%):</span>
-                    <span id="res-disc">0.00</span>
-                </div>
-                <div class="flex justify-between items-center text-green-500 font-black">
-                    <span><i class="fas fa-trophy mr-2 text-xl"></i> หักรางวัลที่ถูก:</span>
-                    <span id="res-win" class="text-xl">0.00</span>
-                </div>
-                <div class="border-t border-gray-100 pt-6 mt-2 flex justify-between items-center text-indigo-500">
-                    <span class="text-xl font-bold">ยอดสุทธิ:</span>
-                    <span id="res-net" class="text-5xl font-black drop-shadow-sm">0.00</span>
-                </div>
+            <div class="grid grid-cols-2 gap-2 mt-6">
+                <button onclick="saveBill()" class="col-span-2 bg-green-500 text-white py-4 rounded-2xl font-bold shadow-lg mb-2">💾 บันทึกบิลลงระบบ</button>
+                <button onclick="takeSnapshot(1)" class="bg-white/10 p-3 rounded-xl text-xs font-bold border border-white/20 text-yellow-400">📸 บิลหัก %</button>
+                <button onclick="takeSnapshot(2)" class="bg-white/10 p-3 rounded-xl text-xs font-bold border border-white/20">📸 บิลไม่หัก %</button>
             </div>
-            <button onclick="takeSnapshot()" class="w-full mt-8 bg-indigo-50 text-indigo-400 border-2 border-indigo-100 py-4 rounded-[30px] font-black text-lg hover:bg-indigo-100 transition-all">
-                <i class="fas fa-camera-retro mr-2 text-xl"></i> บันทึกรูปบิล
-            </button>
         </div>
+    </div>
+
+    <div id="page2" class="max-w-md mx-auto px-6 py-8 hidden space-y-6">
+        <div class="grid grid-cols-2 gap-4">
+            <div class="pastel-card p-4 text-center border-b-4 border-indigo-400">
+                <p class="text-[10px] font-bold text-gray-400 uppercase">บิลทั้งหมด</p>
+                <p id="dash-count" class="text-3xl font-black text-indigo-600">0</p>
+            </div>
+            <div class="pastel-card p-4 text-center border-b-4 border-green-400">
+                <p class="text-[10px] font-bold text-gray-400 uppercase">บิลที่ถูกรางวัล</p>
+                <p id="dash-win-count" class="text-3xl font-black text-green-500">0</p>
+            </div>
+        </div>
+
+        <div id="historyList" class="space-y-4">
+            </div>
+
+        <button onclick="clearAllData()" class="w-full py-4 text-red-400 text-xs font-bold opacity-50"><i class="fas fa-trash mr-1"></i> ล้างข้อมูลทั้งหมดในงวดนี้</button>
     </div>
 
     <div style="position: absolute; left: -9999px;">
-        <div id="bill-capture">
-            <div class="text-center border-b-4 border-indigo-50 pb-8 mb-8">
-                <i class="fas fa-heart text-pink-200 text-5xl mb-2"></i>
-                <h2 class="font-black text-4xl text-indigo-400 italic tracking-tighter uppercase">SUDA LOTTERY</h2>
-                <p id="bill-date" class="text-[11px] text-gray-300 font-bold uppercase tracking-widest mt-2"></p>
+        <div id="bill-capture-1">
+            <h2 class="font-black text-center text-indigo-500 text-2xl">SUDA - บิลหัก %</h2>
+            <p id="b1-cust" class="mt-4 font-bold border-b pb-2"></p>
+            <table class="w-full text-sm mt-4" id="b1-table"></table>
+            <div class="mt-6 p-4 bg-gray-50 rounded-2xl space-y-1">
+                <div class="flex justify-between"><span>ยอดรวม:</span><span id="b1-total"></span></div>
+                <div class="flex justify-between text-red-500"><span>ส่วนลด (27%):</span><span id="b1-disc"></span></div>
+                <div class="flex justify-between text-green-600 font-bold"><span>ถูกรางวัล:</span><span id="b1-win"></span></div>
+                <div class="flex justify-between text-xl font-bold border-t pt-2 mt-2"><span>สุทธิ:</span><span id="b1-net"></span></div>
             </div>
-            <p class="mb-6 px-2 text-lg"><strong>ลูกค้า:</strong> <span id="bill-cust" class="text-indigo-400 font-black underline decoration-indigo-100 underline-offset-8"></span></p>
-            <table class="w-full text-sm mb-12 border-collapse text-left">
-                <thead class="border-b-2 border-indigo-50 text-gray-400 uppercase text-[10px] font-bold">
-                    <tr><th class="py-3">รายการ</th><th class="py-3 text-center">ประเภท</th><th class="py-3 text-right">จำนวนเงิน</th></tr>
-                </thead>
-                <tbody id="bill-items-list" class="divide-y divide-indigo-50"></tbody>
-            </table>
-            <div class="bg-indigo-50/50 p-10 rounded-[45px] space-y-3">
-                <div class="flex justify-between text-xs text-gray-400 font-bold uppercase"><span>Subtotal:</span><span id="b-total"></span></div>
-                <div class="flex justify-between text-xs text-pink-300 font-bold uppercase"><span>Discount (27%):</span><span id="b-disc"></span></div>
-                <div class="flex justify-between text-xs text-green-500 font-black uppercase"><span>Prize Won:</span><span id="b-win"></span></div>
-                <div class="flex justify-between text-4xl font-black text-indigo-400 pt-6 border-t-2 border-indigo-100 mt-2">
-                    <span class="text-xs self-center font-bold tracking-widest opacity-40 uppercase">Grand Total:</span><span id="b-net"></span>
-                </div>
+        </div>
+        <div id="bill-capture-2">
+            <h2 class="font-black text-center text-gray-700 text-2xl">SUDA - บิลเต็ม</h2>
+            <p id="b2-cust" class="mt-4 font-bold border-b pb-2"></p>
+            <table class="w-full text-sm mt-4" id="b2-table"></table>
+            <div class="mt-6 p-4 bg-gray-50 rounded-2xl">
+                <div class="flex justify-between text-xl font-bold"><span>ยอดชำระ:</span><span id="b2-net"></span></div>
             </div>
-            <p class="text-center text-[10px] mt-10 text-gray-300 italic font-bold">** Thank you for choosing Suda Lottery **</p>
         </div>
     </div>
 
     <script>
         let items = [];
+        let allBills = JSON.parse(localStorage.getItem('suda_bills')) || [];
         let currentType = "บน";
-        // ปรับเรทรางวัลตามโจทย์คุณอ้อ 3 บน = 500
-        const RATES = { 
-            "บน": (n) => n.length === 3 ? 500 : 60, 
-            "ล่าง": 60, 
-            "โต๊ด": 80, 
-            "อั้น": 30, 
-            "ชุดพิเศษ": 60 
-        };
+        const RATES = { "บน": (n) => n.length === 3 ? 500 : 60, "ล่าง": 60, "โต๊ด": 80, "อั้น": 30 };
+
+        function showPage(pageId) {
+            document.getElementById('page1').classList.add('hidden');
+            document.getElementById('page2').classList.add('hidden');
+            document.getElementById(pageId).classList.remove('hidden');
+            document.getElementById('tab1').classList.toggle('tab-active', pageId === 'page1');
+            document.getElementById('tab2').classList.toggle('tab-active', pageId === 'page2');
+            if(pageId === 'page2') renderHistory();
+        }
 
         function setType(type, btn) {
             currentType = type;
@@ -135,120 +123,112 @@
             btn.classList.add('type-btn-active');
         }
 
-        function getPermutations(str) {
-            if (str.length === 1) return [str];
-            let perms = [];
-            for (let i = 0; i < str.length; i++) {
-                let char = str[i];
-                let remaining = str.slice(0, i) + str.slice(i + 1);
-                for (let p of getPermutations(remaining)) perms.push(char + p);
-            }
-            return [...new Set(perms)];
-        }
-
-        function handleSmartReverse() {
-            const num = document.getElementById('lotNumber').value;
-            const price = parseFloat(document.getElementById('lotPrice').value) || 0;
-            if (num.length < 2 || price <= 0) return alert("กรุณากรอกเลขและราคา");
-            const perms = getPermutations(num);
-            if(currentType === 'บน+ล่าง') {
-                addAsGroup(perms, 'บน', price);
-                addAsGroup(perms, 'ล่าง', price);
-            } else {
-                addAsGroup(perms, currentType, price);
-            }
-            renderItems();
-        }
-
-        function addAsGroup(nums, type, price) {
-            const winRate = (typeof RATES[type] === 'function') ? RATES[type](nums[0]) : RATES[type];
-            items.push({
-                id: Date.now() + Math.random(),
-                nums: nums,
-                type: type,
-                pricePerUnit: price,
-                potentialWin: price * winRate,
-                isWon: false
-            });
-        }
-
         function addItem() {
             const num = document.getElementById('lotNumber').value;
             const price = parseFloat(document.getElementById('lotPrice').value) || 0;
-            if(!num || price <= 0) return alert("กรุณาระบุข้อมูลให้ครบถ้วน");
-            if(currentType === 'บน+ล่าง') {
-                addAsGroup([num], 'บน', price);
-                addAsGroup([num], 'ล่าง', price);
-            } else {
-                addAsGroup([num], currentType, price);
-            }
-            renderItems();
-        }
-
-        function removeItem(id) { items = items.filter(i => i.id !== id); renderItems(); }
-        function toggleWin(id) { 
-            const idx = items.findIndex(i => i.id === id);
-            items[idx].isWon = !items[idx].isWon;
+            if(!num || price <= 0) return alert("ระบุข้อมูลก่อน");
+            const rate = (typeof RATES[currentType] === 'function') ? RATES[currentType](num) : RATES[currentType];
+            items.push({ num, type: currentType, price, potentialWin: price * rate, isWon: false });
+            document.getElementById('lotNumber').value = "";
             renderItems();
         }
 
         function renderItems() {
             const list = document.getElementById('itemList');
-            const bList = document.getElementById('bill-items-list');
-            list.innerHTML = ""; bList.innerHTML = "";
-            let totalSales = 0;
-            let totalWin = 0;
-
-            items.forEach((item) => {
-                const count = item.nums.length;
-                const rowTotal = count * item.pricePerUnit;
-                totalSales += rowTotal;
-                if(item.isWon) totalWin += item.potentialWin;
-
+            list.innerHTML = "";
+            items.forEach((item, index) => {
                 list.innerHTML += `
-                    <div class="pastel-card p-5 border-2 ${item.isWon ? 'border-green-400 bg-green-50' : 'border-white shadow-sm'} transition-all">
-                        <div class="flex justify-between items-center">
-                            <div class="flex-1 pr-4">
-                                <p class="text-2xl font-black text-indigo-500 break-all leading-tight tracking-tighter">${item.nums.join('/')}</p>
-                                <p class="text-[9px] font-bold text-gray-300 uppercase mt-1 tracking-widest">${item.type} | ${count} ตัว x ฿${item.pricePerUnit}</p>
-                                ${item.isWon ? `<p class="text-[10px] text-green-600 font-bold mt-1 italic animate-pulse">รางวัล: ฿${item.potentialWin.toLocaleString()}</p>` : ''}
+                    <div class="pastel-card p-4 flex justify-between items-center ${item.isWon ? 'border-green-400 bg-green-50' : ''}">
+                        <div><p class="text-xl font-black text-indigo-500">${item.num}</p><p class="text-[9px] uppercase font-bold text-gray-300">${item.type}</p></div>
+                        <div class="flex items-center space-x-3">
+                            <span class="font-bold">฿${item.price}</span>
+                            <button onclick="toggleWin(${index})" class="w-8 h-8 rounded-lg ${item.isWon ? 'bg-green-500 text-white' : 'bg-gray-100'}"><i class="fas fa-trophy"></i></button>
+                            <button onclick="removeItem(${index})" class="text-red-300"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>`;
+            });
+            calculateAll();
+        }
+
+        function calculateAll() {
+            const total = items.reduce((s, i) => s + i.price, 0);
+            const disc = total * 0.27;
+            const win = items.reduce((s, i) => i.isWon ? s + i.potentialWin : s, 0);
+            const net = (total - disc) - win;
+            document.getElementById('res-total').innerText = total.toLocaleString();
+            document.getElementById('res-disc').innerText = "-" + disc.toLocaleString();
+            document.getElementById('res-net').innerText = net.toLocaleString();
+        }
+
+        function saveBill() {
+            if(items.length === 0) return alert("ไม่มีรายการ");
+            const bill = {
+                id: Date.now(),
+                customer: document.getElementById('custName').value || 'ลูกค้าทั่วไป',
+                items: [...items],
+                totalSales: items.reduce((s, i) => s + i.price, 0),
+                totalWin: items.reduce((s, i) => i.isWon ? s + i.potentialWin : s, 0),
+                date: new Date().toLocaleString('th-TH')
+            };
+            allBills.push(bill);
+            localStorage.setItem('suda_bills', JSON.stringify(allBills));
+            alert("บันทึกบิลเรียบร้อย!");
+            items = [];
+            document.getElementById('custName').value = "";
+            renderItems();
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = "";
+            let winCount = 0;
+            allBills.forEach(bill => {
+                const isWon = bill.totalWin > 0;
+                if(isWon) winCount++;
+                list.innerHTML += `
+                    <div class="pastel-card p-5 border-l-8 ${isWon ? 'border-green-400' : 'border-indigo-100'}">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-bold text-lg text-indigo-900">${bill.customer}</p>
+                                <p class="text-[9px] text-gray-400">${bill.date}</p>
                             </div>
-                            <div class="text-right flex flex-col items-end">
-                                <p class="text-lg font-black text-gray-700">฿${rowTotal.toLocaleString()}</p>
-                                <div class="flex space-x-2 mt-2">
-                                    <button onclick="toggleWin(${item.id})" class="w-12 h-12 rounded-2xl shadow-sm ${item.isWon ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-300'} transition-all hover:scale-110 active:scale-95"><i class="fas fa-trophy text-sm"></i></button>
-                                    <button onclick="removeItem(${item.id})" class="text-pink-200 hover:text-pink-400 transition-all"><i class="fas fa-times-circle text-2xl"></i></button>
-                                </div>
+                            <div class="text-right">
+                                <p class="font-black">฿${bill.totalSales.toLocaleString()}</p>
+                                ${isWon ? `<p class="text-[10px] text-green-500 font-bold">ถูกรางวัล: ฿${bill.totalWin.toLocaleString()}</p>` : ''}
                             </div>
                         </div>
                     </div>`;
-                bList.innerHTML += `<tr><td class="py-4 font-black text-gray-700 pr-2">${item.nums.join('/')}</td><td class="text-[9px] text-gray-400 font-bold uppercase text-center">${item.type}</td><td class="text-right font-black text-indigo-400">฿${rowTotal.toLocaleString()}</td></tr>`;
             });
-            updateSummary(totalSales, totalWin);
+            document.getElementById('dash-count').innerText = allBills.length;
+            document.getElementById('dash-win-count').innerText = winCount;
         }
 
-        function updateSummary(total, win) {
+        function takeSnapshot(mode) {
+            const billId = mode === 1 ? 'bill-capture-1' : 'bill-capture-2';
+            const total = items.reduce((s, i) => s + i.price, 0);
             const disc = total * 0.27;
-            const net = (total - disc) - win;
-            document.getElementById('res-total').innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('res-disc').innerText = "-" + disc.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('res-win').innerText = "-" + win.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('res-net').innerText = net.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('bill-cust').innerText = document.getElementById('custName').value || 'ลูกค้าทั่วไป';
-            document.getElementById('b-total').innerText = total.toLocaleString();
-            document.getElementById('b-disc').innerText = "-" + disc.toLocaleString();
-            document.getElementById('b-win').innerText = "-" + win.toLocaleString();
-            document.getElementById('b-net').innerText = net.toLocaleString() + " บาท";
-            document.getElementById('bill-date').innerText = new Date().toLocaleString('th-TH', {dateStyle: 'long', timeStyle: 'short'});
-        }
-
-        function takeSnapshot() {
-            if(items.length === 0) return alert("กรุณาเพิ่มรายการลงในบิลก่อนครับ");
-            html2canvas(document.getElementById('bill-capture'), { scale: 3, borderRadius: 40, useCORS: true }).then(c => {
-                const a = document.createElement('a'); a.download = `SudaLottery-Receipt-${Date.now()}.png`;
+            const win = items.reduce((s, i) => i.isWon ? s + i.potentialWin : s, 0);
+            
+            document.getElementById(`b${mode}-cust`).innerText = document.getElementById('custName').value || 'ลูกค้าทั่วไป';
+            document.getElementById(`b${mode}-total`).innerText = total.toLocaleString();
+            if(mode === 1) {
+                document.getElementById('b1-disc').innerText = "-" + disc.toLocaleString();
+                document.getElementById('b1-win').innerText = "-" + win.toLocaleString();
+                document.getElementById('b1-net').innerText = ((total - disc) - win).toLocaleString();
+            } else {
+                document.getElementById('b2-net').innerText = total.toLocaleString();
+            }
+            
+            html2canvas(document.getElementById(billId), { scale: 3 }).then(c => {
+                const a = document.createElement('a'); a.download = `Suda-Bill-${mode}.png`;
                 a.href = c.toDataURL(); a.click();
             });
         }
+
+        function clearAllData() { if(confirm("ล้างข้อมูลทั้งหมด?")) { localStorage.removeItem('suda_bills'); allBills = []; renderHistory(); } }
+        function removeItem(idx) { items.splice(idx, 1); renderItems(); }
+        function toggleWin(idx) { items[idx].isWon = !items[idx].isWon; renderItems(); }
+        function showPage(p) { /* ฟังก์ชันสลับหน้า */ document.getElementById('page1').classList.toggle('hidden', p!=='page1'); document.getElementById('page2').classList.toggle('hidden', p!=='page2'); }
         setType('บน', document.querySelector('[data-val="บน"]'));
     </script>
 </body>
