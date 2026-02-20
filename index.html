@@ -3,116 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suda Lottery - Full Automated System</title>
+    <title>Suda Lottery - Classic Buttons & Auto Check</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap');
         body { font-family: 'Kanit', sans-serif; background: #fdfbfb; }
-        .pastel-card { background: white; border-radius: 1.5rem; border: 1px solid #f1f5f9; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .type-btn-active { background: #6366f1 !important; color: white !important; }
+        .pastel-card { background: white; border-radius: 2.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; }
+        .type-btn-active { background: #6366f1 !important; color: white !important; border-color: #6366f1 !important; transform: scale(1.05); }
         .nav-tab-active { color: #6366f1; border-bottom: 4px solid #6366f1; }
-        #bill-capture-1, #bill-capture-2 { width: 400px; background: white; padding: 30px; border-radius: 20px; color: #334155; }
+        .pastel-header { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+        #bill-capture-1, #bill-capture-2 { width: 420px; background: white; padding: 40px; border-radius: 40px; }
     </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="min-h-screen pb-24">
 
     <div class="sticky top-0 z-50 bg-white shadow-sm flex">
-        <button onclick="changePage('page1')" id="btn-page1" class="flex-1 py-4 font-bold nav-tab-active"><i class="fas fa-edit mr-2"></i>หน้าออกบิล</button>
-        <button onclick="changePage('page2')" id="btn-page2" class="flex-1 py-4 font-bold text-gray-400"><i class="fas fa-chart-line mr-2"></i>หน้าสรุปงวด</button>
+        <button onclick="changePage('page1')" id="btn-page1" class="flex-1 py-4 font-bold nav-tab-active text-sm">
+            <i class="fas fa-edit mr-2 text-indigo-400"></i>หน้าออกบิล
+        </button>
+        <button onclick="changePage('page2')" id="btn-page2" class="flex-1 py-4 font-bold text-gray-400 text-sm">
+            <i class="fas fa-chart-line mr-2"></i>หน้าสรุปงวด
+        </button>
     </div>
 
-    <div id="page1" class="max-w-md mx-auto px-4 py-6 space-y-4">
-        <div class="pastel-card p-6 border-t-8 border-indigo-400">
+    <div id="page1" class="max-w-md mx-auto px-6 py-6 space-y-6">
+        <div class="pastel-card p-6 border-t-8 border-indigo-200 shadow-sm">
             <div class="flex justify-between items-center mb-2">
-                <label class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">ชื่อลูกค้า</label>
+                <label class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Client Name</label>
                 <span id="edit-tag" class="hidden text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold">โหมดแก้ไข</span>
             </div>
-            <input type="text" id="custName" class="w-full border-b-2 border-gray-100 p-2 outline-none font-bold text-lg" placeholder="ระบุชื่อลูกค้า...">
+            <input type="text" id="custName" class="w-full border-b-2 border-indigo-50 p-2 outline-none font-bold text-lg" placeholder="ระบุชื่อลูกค้า...">
             
-            <div class="grid grid-cols-12 gap-2 mt-4">
-                <input type="text" id="lotNumber" class="col-span-8 bg-gray-50 p-3 rounded-xl text-2xl font-black outline-none border-2 border-transparent focus:border-indigo-200" placeholder="เลข">
-                <button onclick="handleSmartReverse()" class="col-span-4 bg-indigo-500 text-white rounded-xl font-bold text-xs shadow-md">สลับชุด</button>
-                
-                <div class="col-span-12 grid grid-cols-3 gap-2 py-2">
-                    <button onclick="toggleType('บน', this)" class="type-btn p-3 rounded-xl border text-[10px] font-bold bg-white text-gray-400" data-val="บน">บน (60/500)</button>
-                    <button onclick="toggleType('โต๊ด', this)" class="type-btn p-3 rounded-xl border text-[10px] font-bold bg-white text-gray-400" data-val="โต๊ด">โต๊ด (80)</button>
-                    <button onclick="toggleType('ล่าง', this)" class="type-btn p-3 rounded-xl border text-[10px] font-bold bg-white text-gray-400" data-val="ล่าง">ล่าง (60)</button>
+            <div class="grid grid-cols-12 gap-3 mt-4">
+                <div class="col-span-12 flex space-x-2">
+                    <input type="text" id="lotNumber" class="flex-1 bg-gray-50 border-2 border-gray-50 p-3 rounded-2xl text-2xl font-black outline-none focus:border-indigo-300" placeholder="เลข">
+                    <button onclick="handleSmartReverse()" class="bg-indigo-500 text-white px-4 rounded-2xl font-bold text-xs shadow-md">สลับชุด</button>
                 </div>
-                
-                <input type="number" id="lotPrice" class="col-span-12 bg-orange-50 p-4 rounded-xl text-2xl font-black text-orange-600 outline-none" placeholder="ราคาต่อตัว">
+
+                <div class="col-span-12 grid grid-cols-3 gap-2 py-2">
+                    <button onclick="toggleType('บน', this)" class="type-btn p-3 rounded-xl border-2 border-indigo-50 text-[11px] font-bold bg-gray-50 text-indigo-300" data-val="บน">บน</button>
+                    <button onclick="toggleType('ล่าง', this)" class="type-btn p-3 rounded-xl border-2 border-indigo-50 text-[11px] font-bold bg-gray-50 text-indigo-300" data-val="ล่าง">ล่าง</button>
+                    <button onclick="toggleType('บน+ล่าง', this)" class="type-btn p-3 rounded-xl border-2 border-indigo-50 text-[11px] font-bold bg-gray-50 text-indigo-300" data-val="บน+ล่าง">บน+ล่าง</button>
+                    <button onclick="toggleType('โต๊ด', this)" class="type-btn p-3 rounded-xl border-2 border-indigo-50 text-[11px] font-bold bg-gray-50 text-indigo-300" data-val="โต๊ด">โต๊ด</button>
+                    <button onclick="toggleType('อั้น', this)" class="type-btn p-3 rounded-xl border-2 border-indigo-50 text-[11px] font-bold bg-gray-50 text-indigo-300" data-val="อั้น">อั้น (30)</button>
+                    <button onclick="toggleType('ชุด', this)" class="type-btn p-3 rounded-xl border-2 border-indigo-50 text-[11px] font-bold bg-gray-50 text-indigo-300" data-val="ชุด">ชุดพิเศษ</button>
+                </div>
+
+                <div class="col-span-12">
+                    <input type="number" id="lotPrice" class="w-full bg-orange-50 border-2 border-orange-50 p-4 rounded-2xl text-2xl font-black text-orange-400 outline-none" placeholder="0.00">
+                </div>
             </div>
-            <button onclick="addItem()" class="w-full mt-6 bg-indigo-500 text-white py-4 rounded-xl font-bold shadow-lg">เพิ่มรายการลงบิล</button>
+            <button onclick="addItem()" class="w-full mt-6 bg-indigo-500 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition-all">
+                เพิ่มรายการลงบิล
+            </button>
         </div>
 
-        <div id="itemList" class="space-y-2"></div>
+        <div id="itemList" class="space-y-3"></div>
 
-        <div class="pastel-card p-6 bg-indigo-900 text-white shadow-xl">
+        <div class="pastel-card p-8 bg-indigo-900 text-white">
             <div class="space-y-2 text-sm">
                 <div class="flex justify-between opacity-70"><span>ยอดซื้อรวม:</span><span id="res-total">0.00</span></div>
                 <div class="flex justify-between text-yellow-400 font-bold"><span>ส่วนลดคอม (27%):</span><span id="res-disc">0.00</span></div>
                 <div class="flex justify-between border-t border-indigo-800 pt-3 text-2xl font-black">
-                    <span>ยอดสุทธิ:</span><span id="res-net">0.00</span>
+                    <span class="text-indigo-300 text-lg font-bold uppercase">Net Total:</span><span id="res-net">0.00</span>
                 </div>
             </div>
-            <button onclick="saveBillToHistory()" class="w-full mt-6 bg-green-500 text-white py-4 rounded-xl font-black shadow-lg">บันทึกบิลเข้าหน้าสรุป</button>
+            <button onclick="saveBillToHistory()" class="w-full mt-6 bg-green-500 text-white py-4 rounded-2xl font-black shadow-lg">บันทึกบิลเข้าหน้าสรุป</button>
             <div class="grid grid-cols-2 gap-2 mt-2">
-                <button onclick="takeSnapshot(1)" class="bg-white/10 p-2 rounded-lg text-[10px] font-bold">📸 บิลหัก %</button>
-                <button onclick="takeSnapshot(2)" class="bg-white/10 p-2 rounded-lg text-[10px] font-bold">📸 บิลยอดเต็ม</button>
+                <button onclick="takeSnapshot(1)" class="bg-white/10 p-2 rounded-lg text-[10px] font-bold border border-white/20">📸 บิลหัก %</button>
+                <button onclick="takeSnapshot(2)" class="bg-white/10 p-2 rounded-lg text-[10px] border border-white/20">📸 บิลเต็ม</button>
             </div>
         </div>
     </div>
 
-    <div id="page2" class="max-w-md mx-auto px-4 py-6 hidden space-y-6">
-        
-        <div class="pastel-card p-6 border-l-8 border-yellow-500 bg-white shadow-md">
-            <h3 class="font-bold text-gray-700 mb-4 flex items-center"><i class="fas fa-bullhorn mr-2 text-yellow-500"></i> กรอกผลรางวัลเพื่อตรวจเช็ค</h3>
+    <div id="page2" class="max-w-md mx-auto px-6 py-8 hidden space-y-6">
+        <div class="pastel-card p-6 border-l-8 border-yellow-500 bg-white">
+            <h3 class="font-bold text-gray-700 mb-3 text-sm flex items-center"><i class="fas fa-trophy mr-2 text-yellow-500"></i> ตรวจรางวัลอัตโนมัติ</h3>
             <div class="grid grid-cols-3 gap-2">
-                <div>
-                    <label class="text-[9px] font-bold uppercase text-gray-400">3 ตัวบน</label>
-                    <input type="text" id="win3Top" class="w-full border-b-2 border-indigo-50 p-2 text-xl font-black text-indigo-600 outline-none focus:border-indigo-300" placeholder="123">
-                </div>
-                <div>
-                    <label class="text-[9px] font-bold uppercase text-gray-400">2 ตัวบน</label>
-                    <input type="text" id="win2Top" class="w-full border-b-2 border-indigo-50 p-2 text-xl font-black text-indigo-600 outline-none focus:border-indigo-300" placeholder="23">
-                </div>
-                <div>
-                    <label class="text-[9px] font-bold uppercase text-gray-400">2 ตัวล่าง</label>
-                    <input type="text" id="win2Bottom" class="w-full border-b-2 border-indigo-50 p-2 text-xl font-black text-indigo-600 outline-none focus:border-indigo-300" placeholder="45">
-                </div>
+                <input type="text" id="win3Top" class="border-b-2 p-2 text-xl font-black text-center outline-none" placeholder="3บน">
+                <input type="text" id="win2Top" class="border-b-2 p-2 text-xl font-black text-center outline-none" placeholder="2บน">
+                <input type="text" id="win2Bottom" class="border-b-2 p-2 text-xl font-black text-center outline-none" placeholder="2ล่าง">
             </div>
-            <button onclick="autoCheckPrizes()" class="w-full mt-4 bg-yellow-500 text-white py-3 rounded-xl font-black shadow-md hover:bg-yellow-600 active:scale-95 transition-all">
-                <i class="fas fa-search-dollar mr-2"></i> ตรวจรางวัลอัตโนมัติ
+            <button onclick="autoCheckPrizes()" class="w-full mt-4 bg-yellow-500 text-white py-3 rounded-xl font-black shadow-md active:scale-95 transition-all">
+                คลิกเดียว..ตรวจรางวัลทั้งหมด
             </button>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
-            <div class="pastel-card p-4 text-center border-b-4 border-indigo-400">
-                <p class="text-[10px] font-bold text-gray-400 uppercase">บิลทั้งหมด</p>
+            <div class="pastel-card p-5 text-center border-b-4 border-indigo-400">
                 <p id="dash-bill-count" class="text-3xl font-black text-indigo-600">0</p>
+                <p class="text-[9px] font-bold text-gray-300 uppercase">Bills</p>
             </div>
-            <div class="pastel-card p-4 text-center border-b-4 border-green-400">
-                <p class="text-[10px] font-bold text-gray-400 uppercase">บิลที่ถูกรางวัล</p>
+            <div class="pastel-card p-5 text-center border-b-4 border-green-400">
                 <p id="dash-win-count" class="text-3xl font-black text-green-500">0</p>
+                <p class="text-[9px] font-bold text-gray-300 uppercase">Winners</p>
             </div>
         </div>
 
-        <div class="relative">
-            <i class="fas fa-search absolute left-4 top-4 text-gray-300"></i>
-            <input type="text" id="searchInput" oninput="renderDashboard()" class="w-full bg-white p-3.5 pl-11 rounded-2xl outline-none shadow-sm" placeholder="ค้นหาชื่อลูกค้า...">
-        </div>
-
-        <div id="historyList" class="space-y-3"></div>
-        <button onclick="clearAllData()" class="w-full py-8 text-red-300 text-[10px] font-bold uppercase tracking-widest"><i class="fas fa-trash-alt mr-2"></i>ล้างข้อมูลทั้งหมดในงวดนี้</button>
+        <input type="text" id="searchInput" oninput="renderDashboard()" class="w-full bg-white p-4 rounded-2xl outline-none shadow-sm text-sm" placeholder="🔍 ค้นหาชื่อลูกค้า...">
+        <div id="historyList" class="space-y-4"></div>
+        <button onclick="clearAllData()" class="w-full text-red-300 text-[10px] font-bold py-6 uppercase tracking-widest">ล้างข้อมูลทั้งหมด</button>
     </div>
 
     <div style="position: absolute; left: -9999px;">
         <div id="bill-capture-1">
-            <h2 class="text-center font-black text-indigo-500 text-2xl border-b-2 pb-2 uppercase italic">Suda Lottery</h2>
+            <h2 class="text-center font-black text-indigo-500 text-2xl border-b-2 pb-2">SUDA - หักคอม 27%</h2>
             <p id="b1-cust" class="mt-4 font-bold text-lg"></p>
             <table class="w-full mt-4 text-left text-sm" id="b1-table"></table>
-            <div class="mt-6 border-t-2 pt-4 bg-gray-50 p-4 rounded-2xl space-y-1">
+            <div class="mt-4 border-t-2 pt-4 space-y-1">
                 <div class="flex justify-between text-xs"><span>ยอดซื้อ:</span><span id="b1-total"></span></div>
                 <div class="flex justify-between text-red-500"><span>ส่วนลด (27%):</span><span id="b1-disc"></span></div>
                 <div class="flex justify-between text-green-600 font-bold"><span>รางวัล:</span><span id="b1-win"></span></div>
@@ -120,11 +120,11 @@
             </div>
         </div>
         <div id="bill-capture-2">
-            <h2 class="text-center font-black text-indigo-400 text-2xl border-b-2 pb-2 uppercase italic">Suda Lottery</h2>
+            <h2 class="text-center font-black text-indigo-500 text-2xl border-b-2 pb-2">SUDA - บิลยอดเต็ม</h2>
             <p id="b2-cust" class="mt-4 font-bold text-lg"></p>
             <table class="w-full mt-4 text-left text-sm" id="b2-table"></table>
-            <div class="mt-6 border-t-2 pt-6 flex justify-between items-center text-3xl font-black">
-                <span class="text-xs text-gray-400 uppercase">Total:</span><span id="b2-net"></span>
+            <div class="mt-4 border-t-2 pt-4">
+                <div class="flex justify-between text-3xl font-black text-gray-800"><span>รวมยอด:</span><span id="b2-net"></span></div>
             </div>
         </div>
     </div>
@@ -133,17 +133,24 @@
         let currentItems = [];
         let currentType = "";
         let editingBillId = null;
-        const RATES = { "บน": (n) => n.length === 3 ? 500 : 60, "ล่าง": 60, "โต๊ด": 80, "อั้น": 30 };
+        const RATES = { "บน": (n) => n.length === 3 ? 500 : 60, "ล่าง": 60, "โต๊ด": 80, "อั้น": 30, "ชุด": 60 };
 
-        function changePage(pageId) {
-            document.getElementById('page1').classList.add('hidden');
-            document.getElementById('page2').classList.add('hidden');
-            document.getElementById(pageId).classList.remove('hidden');
-            document.getElementById('btn-page1').classList.toggle('nav-tab-active', pageId === 'page1');
-            document.getElementById('btn-page2').classList.toggle('nav-tab-active', pageId === 'page2');
-            if(pageId === 'page2') renderDashboard();
+        function changePage(p) {
+            document.getElementById('page1').classList.toggle('hidden', p!=='page1');
+            document.getElementById('page2').classList.toggle('hidden', p!=='page2');
+            document.getElementById('btn-page1').classList.toggle('nav-tab-active', p==='page1');
+            document.getElementById('btn-page2').classList.toggle('nav-tab-active', p==='page2');
+            if(p==='page2') renderDashboard();
         }
 
         function toggleType(type, btn) {
             if (currentType === type) { currentType = ""; btn.classList.remove('type-btn-active'); }
-            else { currentType = type; document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('
+            else { currentType = type; document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('type-btn-active')); btn.classList.add('type-btn-active'); }
+        }
+
+        function getPerms(str) {
+            if (str.length === 1) return [str];
+            let p = [];
+            for (let i = 0; i < str.length; i++) {
+                let char = str[i], rem = str.slice(0, i) + str.slice(i + 1);
+                for (let r of getPerms(rem)) p.push(char + r);
