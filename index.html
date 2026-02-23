@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suda Lottery - Full Edition</title>
+    <title>Suda Lottery - Smart Buttons</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -11,26 +11,31 @@
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap');
         body { font-family: 'Kanit', sans-serif; background: #fdfbfb; }
         .pastel-card { background: white; border-radius: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; }
-        .type-btn-active { background: #6366f1 !important; color: white !important; border-color: #6366f1 !important; transform: scale(1.05); }
+        .type-btn-active { background: #6366f1 !important; color: white !important; transform: scale(1.05); }
         .nav-tab-active { color: #6366f1; border-bottom: 4px solid #6366f1; }
-        #bill-capture-1, #bill-capture-2 { width: 400px; background: white; padding: 30px; border-radius: 20px; color: #334155; }
+        #bill-capture-1, #bill-capture-2 { width: 400px; background: white; padding: 30px; border-radius: 20px; }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body class="min-h-screen pb-20">
 
     <div class="sticky top-0 z-50 bg-white shadow-sm flex">
         <button onclick="changePage('page1')" id="btn-page1" class="flex-1 py-4 font-bold nav-tab-active">
-            <i class="fas fa-edit mr-2 text-indigo-400"></i>หน้าออกบิล
+            <i class="fas fa-edit mr-2"></i>หน้าออกบิล
         </button>
         <button onclick="changePage('page2')" id="btn-page2" class="flex-1 py-4 font-bold text-gray-400">
-            <i class="fas fa-chart-pie mr-2 text-indigo-400"></i>หน้าสรุปงวด
+            <i class="fas fa-chart-pie mr-2"></i>หน้าสรุปงวด
         </button>
     </div>
 
     <div id="page1" class="max-w-md mx-auto px-4 py-6 space-y-4">
         <div class="pastel-card p-6">
-            <label class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Client Name</label>
-            <input type="text" id="custName" class="w-full border-b-2 border-gray-100 p-2 outline-none font-bold text-lg focus:border-indigo-300" placeholder="ชื่อลูกค้า / งวด...">
+            <div class="flex justify-between items-center mb-1">
+                <label class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Client Name</label>
+                <span id="edit-mode-tag" class="hidden text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold">โหมดแก้ไข</span>
+            </div>
+            <input type="text" id="custName" class="w-full border-b-2 border-gray-100 p-2 outline-none font-bold text-lg focus:border-indigo-300 transition-all" placeholder="ชื่อลูกค้า / งวด...">
             
             <div class="grid grid-cols-12 gap-2 mt-4">
                 <input type="text" id="lotNumber" class="col-span-8 bg-gray-50 p-4 rounded-xl text-2xl font-black outline-none border-2 border-transparent focus:border-indigo-200" placeholder="เลข">
@@ -54,42 +59,4 @@
 
         <div id="itemList" class="space-y-2"></div>
 
-        <div class="pastel-card p-6 bg-indigo-900 text-white shadow-xl">
-            <div class="space-y-2 text-sm">
-                <div class="flex justify-between opacity-70"><span>ยอดซื้อรวม:</span><span id="res-total">0.00</span></div>
-                <div class="flex justify-between text-yellow-400 font-bold"><span>ส่วนลดคอม (27%):</span><span id="res-disc">0.00</span></div>
-                <div class="flex justify-between border-t border-indigo-800 pt-3 text-2xl font-black">
-                    <span class="text-indigo-300 text-lg">ยอดสุทธิ:</span><span id="res-net" class="text-white">0.00</span>
-                </div>
-            </div>
-            <button onclick="saveBillToSystem()" id="btn-save-bill" class="w-full mt-6 bg-green-500 text-white py-4 rounded-xl font-black shadow-lg">
-                <i class="fas fa-save mr-2"></i> บันทึกข้อมูลเข้าหน้าสรุป
-            </button>
-            <div class="grid grid-cols-2 gap-2 mt-3">
-                <button onclick="takeSnapshot(1)" class="bg-white/10 p-2 rounded-lg text-[10px] border border-white/20 font-bold hover:bg-white/20 transition-all">📸 บิลหัก %</button>
-                <button onclick="takeSnapshot(2)" class="bg-white/10 p-2 rounded-lg text-[10px] border border-white/20 font-bold hover:bg-white/20 transition-all">📸 บิลยอดเต็ม</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="page2" class="max-w-md mx-auto px-4 py-6 hidden space-y-4">
-        
-        <div class="pastel-card p-5 bg-white border-t-4 border-green-500">
-            <h3 class="font-bold text-gray-700 text-sm mb-3">สรุปรายได้รวมงวดนี้</h3>
-            <div class="grid grid-cols-2 gap-2">
-                <div class="bg-gray-50 p-3 rounded-xl text-center">
-                    <p class="text-[9px] text-gray-400 uppercase">ยอดรวมเต็ม</p>
-                    <p id="summary-total-gross" class="text-lg font-black text-indigo-600">0.00</p>
-                </div>
-                <div class="bg-gray-50 p-3 rounded-xl text-center">
-                    <p class="text-[9px] text-gray-400 uppercase">ค่าคอม (27%)</p>
-                    <p id="summary-total-comm" class="text-lg font-black text-pink-500">0.00</p>
-                </div>
-                <div class="bg-green-50 p-3 rounded-xl col-span-2 text-center border border-green-100">
-                    <p class="text-[9px] text-green-600 uppercase font-bold">กำไรสุทธิ (หลังหักรางวัล)</p>
-                    <p id="summary-total-net" class="text-3xl font-black text-green-600">0.00</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
+        <div class="pastel-
