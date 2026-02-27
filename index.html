@@ -119,19 +119,17 @@
         <div>
             <div class="bg-pink-50 border-l-4 border-pink-500 p-4 rounded-r-xl mb-4">
                 <h3 class="font-bold text-pink-800 text-sm flex items-center"><i class="fas fa-fire mr-2 text-pink-500"></i> สรุปยอดขายเลข 3 ตัว</h3>
-                <p class="text-[10px] text-pink-500 mt-1">* เรียงจากยอดซื้อสูงสุดลงมาต่ำสุด</p>
+                <p class="text-[10px] text-pink-500 mt-1">* ระบบจะแยกยอด บน / โต๊ด / ล่าง ในแต่ละเลขให้เห็นชัดเจน</p>
             </div>
-            <div id="summary-list-3d" class="space-y-3">
-                </div>
+            <div id="summary-list-3d" class="space-y-3"></div>
         </div>
 
         <div class="pt-4 border-t-2 border-dashed border-gray-200">
             <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-xl mb-4">
                 <h3 class="font-bold text-indigo-800 text-sm flex items-center"><i class="fas fa-fire mr-2 text-orange-500"></i> สรุปยอดขายเลข 2 ตัว</h3>
-                <p class="text-[10px] text-indigo-500 mt-1">* เรียงจากยอดซื้อสูงสุดลงมาต่ำสุด</p>
+                <p class="text-[10px] text-indigo-500 mt-1">* ระบบจะแยกยอด บน / ล่าง ในแต่ละเลขให้เห็นชัดเจน</p>
             </div>
-            <div id="summary-list-2d" class="space-y-3">
-                </div>
+            <div id="summary-list-2d" class="space-y-3"></div>
         </div>
 
     </div>
@@ -346,7 +344,7 @@
             });
         }
 
-        // 🌟 ฟังก์ชันสำหรับคำนวณหน้า 3 (สรุปแยก 2 ตัว และ 3 ตัว)
+        // 🌟 อัปเดตฟังก์ชันหน้า 3: แยกยอด บน-ล่าง ในเลขเดียวกัน
         function renderNumberSummary() {
             const list2D = document.getElementById('summary-list-2d');
             const list3D = document.getElementById('summary-list-3d');
@@ -355,72 +353,75 @@
             let stats2D = {};
             let stats3D = {};
             
-            // กวาดข้อมูลแยกตามความยาวตัวเลข (2 ตัว และ 3 ตัว)
+            // กวาดข้อมูลหาเลขทั้งหมด พร้อมจำแนก บน-ล่าง-โต๊ด
             allData.forEach(bill => {
                 bill.items.forEach(item => {
                     item.perms.forEach(pNum => {
+                        let target = null;
                         if(pNum.length === 2) {
-                            if(!stats2D[pNum]) stats2D[pNum] = { totalBuy: 0, bills: [] };
-                            stats2D[pNum].totalBuy += item.pricePerItem;
-                            stats2D[pNum].bills.push({ name: bill.customer, type: item.type, price: item.pricePerItem });
+                            if(!stats2D[pNum]) stats2D[pNum] = { totalBuy: 0, top: 0, bottom: 0, toad: 0, other: 0, bills: [] };
+                            target = stats2D[pNum];
                         } else if(pNum.length === 3) {
-                            if(!stats3D[pNum]) stats3D[pNum] = { totalBuy: 0, bills: [] };
-                            stats3D[pNum].totalBuy += item.pricePerItem;
-                            stats3D[pNum].bills.push({ name: bill.customer, type: item.type, price: item.pricePerItem });
+                            if(!stats3D[pNum]) stats3D[pNum] = { totalBuy: 0, top: 0, bottom: 0, toad: 0, other: 0, bills: [] };
+                            target = stats3D[pNum];
+                        }
+
+                        if(target) {
+                            target.totalBuy += item.pricePerItem;
+                            // จำแนกยอดตามประเภท
+                            if(item.type === 'บน' || item.type === 'ชุด') target.top += item.pricePerItem;
+                            else if(item.type === 'ล่าง') target.bottom += item.pricePerItem;
+                            else if(item.type === 'โต๊ด') target.toad += item.pricePerItem;
+                            else target.other += item.pricePerItem;
+                            
+                            target.bills.push({ name: bill.customer, type: item.type, price: item.pricePerItem });
                         }
                     });
                 });
             });
 
-            // เรียงลำดับจากเลขที่มียอดซื้อเยอะสุด ไปน้อยสุด
+            // สร้าง Card สำหรับแสดงผล
+            function createCard(num, data, is3D) {
+                const colorCode = is3D ? 'pink' : 'indigo';
+                
+                // สร้างป้ายแยก บน/ล่าง/โต๊ด
+                let badges = '';
+                if(data.top > 0) badges += `<span class="bg-blue-100 text-blue-700 text-[9px] px-2 py-0.5 rounded font-bold">บน ฿${data.top.toLocaleString()}</span>`;
+                if(data.bottom > 0) badges += `<span class="bg-red-100 text-red-700 text-[9px] px-2 py-0.5 rounded font-bold">ล่าง ฿${data.bottom.toLocaleString()}</span>`;
+                if(data.toad > 0) badges += `<span class="bg-orange-100 text-orange-700 text-[9px] px-2 py-0.5 rounded font-bold">โต๊ด ฿${data.toad.toLocaleString()}</span>`;
+                if(data.other > 0) badges += `<span class="bg-gray-200 text-gray-700 text-[9px] px-2 py-0.5 rounded font-bold">อื่น ฿${data.other.toLocaleString()}</span>`;
+
+                const billListHTML = data.bills.map(b => `
+                    <div class="flex justify-between text-[11px] text-gray-600 items-center py-0.5">
+                        <span>${b.name} <span class="text-[8px] bg-white border border-gray-200 text-gray-400 px-1.5 rounded ml-1 uppercase">${b.type}</span></span>
+                        <span class="font-bold text-gray-800">฿${b.price.toLocaleString()}</span>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="pastel-card p-4 border-l-8 ${is3D ? 'border-pink-400' : 'border-indigo-400'} shadow-sm">
+                        <div class="flex justify-between items-center border-b pb-2 mb-2">
+                            <span class="text-3xl font-black ${is3D ? 'text-pink-600' : 'text-indigo-600'} tracking-wider">${num}</span>
+                            <div class="text-right">
+                                <p class="text-[9px] text-gray-400 uppercase tracking-widest">ยอดรวมทั้งหมด</p>
+                                <p class="text-xl font-black text-gray-800">฿${data.totalBuy.toLocaleString()}</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-1 mb-2">
+                            ${badges}
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2 border border-gray-100 space-y-1">
+                            ${billListHTML}
+                        </div>
+                    </div>`;
+            }
+
             const sorted2D = Object.keys(stats2D).sort((a, b) => stats2D[b].totalBuy - stats2D[a].totalBuy);
             const sorted3D = Object.keys(stats3D).sort((a, b) => stats3D[b].totalBuy - stats3D[a].totalBuy);
 
-            // แสดงผล 3 ตัว
-            list3D.innerHTML = "";
-            if(sorted3D.length === 0) {
-                list3D.innerHTML = `<div class="text-center py-6 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 opacity-50"></i><p class="text-[10px]">ยังไม่มีรายการขาย 3 ตัว</p></div>`;
-            } else {
-                sorted3D.forEach(num => {
-                    const data = stats3D[num];
-                    list3D.innerHTML += `
-                        <div class="pastel-card p-4 border-l-8 border-pink-400 shadow-sm">
-                            <div class="flex justify-between items-center border-b pb-2 mb-2">
-                                <span class="text-3xl font-black text-pink-600 tracking-wider">${num}</span>
-                                <div class="text-right">
-                                    <p class="text-[9px] text-gray-400 uppercase tracking-widest">ยอดซื้อรวม</p>
-                                    <p class="text-xl font-black text-pink-500">฿${data.totalBuy.toLocaleString()}</p>
-                                </div>
-                            </div>
-                            <div class="space-y-1">
-                                ${data.bills.map(b => `<div class="flex justify-between text-[11px] text-gray-600 items-center"><span>${b.name} <span class="text-[8px] bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded ml-1 uppercase">${b.type}</span></span><span class="font-bold text-pink-400">฿${b.price.toLocaleString()}</span></div>`).join('')}
-                            </div>
-                        </div>`;
-                });
-            }
-
-            // แสดงผล 2 ตัว
-            list2D.innerHTML = "";
-            if(sorted2D.length === 0) {
-                list2D.innerHTML = `<div class="text-center py-6 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 opacity-50"></i><p class="text-[10px]">ยังไม่มีรายการขาย 2 ตัว</p></div>`;
-            } else {
-                sorted2D.forEach(num => {
-                    const data = stats2D[num];
-                    list2D.innerHTML += `
-                        <div class="pastel-card p-4 border-l-8 border-indigo-400 shadow-sm">
-                            <div class="flex justify-between items-center border-b pb-2 mb-2">
-                                <span class="text-3xl font-black text-indigo-600 tracking-wider">${num}</span>
-                                <div class="text-right">
-                                    <p class="text-[9px] text-gray-400 uppercase tracking-widest">ยอดซื้อรวม</p>
-                                    <p class="text-xl font-black text-indigo-500">฿${data.totalBuy.toLocaleString()}</p>
-                                </div>
-                            </div>
-                            <div class="space-y-1">
-                                ${data.bills.map(b => `<div class="flex justify-between text-[11px] text-gray-600 items-center"><span>${b.name} <span class="text-[8px] bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded ml-1 uppercase">${b.type}</span></span><span class="font-bold text-indigo-400">฿${b.price.toLocaleString()}</span></div>`).join('')}
-                            </div>
-                        </div>`;
-                });
-            }
+            list3D.innerHTML = sorted3D.length === 0 ? `<div class="text-center py-6 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 opacity-50"></i><p class="text-[10px]">ยังไม่มีรายการขาย 3 ตัว</p></div>` : sorted3D.map(num => createCard(num, stats3D[num], true)).join('');
+            
+            list2D.innerHTML = sorted2D.length === 0 ? `<div class="text-center py-6 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 opacity-50"></i><p class="text-[10px]">ยังไม่มีรายการขาย 2 ตัว</p></div>` : sorted2D.map(num => createCard(num, stats2D[num], false)).join('');
         }
 
         function editBill(id) {
@@ -464,3 +465,4 @@
     </script>
 </body>
 </html>
+
