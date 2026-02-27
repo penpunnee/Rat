@@ -90,10 +90,11 @@
 
         <div class="pastel-card p-5 border-l-8 border-yellow-500 shadow-sm">
             <h3 class="font-bold text-gray-700 mb-3 text-sm flex items-center"><i class="fas fa-trophy mr-2 text-yellow-500"></i> ตรวจรางวัลอัตโนมัติ</h3>
-            <div class="grid grid-cols-3 gap-2">
-                <input type="text" id="win3Top" class="border-b-2 p-2 text-xl font-black text-center outline-none" placeholder="3บน">
-                <input type="text" id="win2Top" class="border-b-2 p-2 text-xl font-black text-center outline-none" placeholder="2บน">
-                <input type="text" id="win2Bottom" class="border-b-2 p-2 text-xl font-black text-center outline-none" placeholder="2ล่าง">
+            <div class="grid grid-cols-4 gap-2">
+                <input type="text" id="win3Top" class="border-b-2 p-1.5 text-lg font-black text-center outline-none" placeholder="3บน">
+                <input type="text" id="win3Front" class="border-b-2 p-1.5 text-lg font-black text-center outline-none text-indigo-500 border-indigo-200" placeholder="3หน้า">
+                <input type="text" id="win2Top" class="border-b-2 p-1.5 text-lg font-black text-center outline-none" placeholder="2บน">
+                <input type="text" id="win2Bottom" class="border-b-2 p-1.5 text-lg font-black text-center outline-none" placeholder="2ล่าง">
             </div>
             <button onclick="autoCheckPrizes()" class="w-full mt-4 bg-yellow-500 text-white py-2.5 rounded-xl font-black shadow-md">คลิกเพื่อตรวจรางวัลทุกบิล</button>
         </div>
@@ -161,23 +162,19 @@
             return [...new Set(p)];
         }
 
-        // 🌟 อัปเดตตรรกะใหม่: จัดกลุ่มและจัดการเงื่อนไขโต๊ด
         function handleSmartReverse() {
             const num = document.getElementById('lotNumber').value;
             const price = parseFloat(document.getElementById('lotPrice').value) || 0;
             if (!currentType || num.length < 2 || price <= 0) return alert("ข้อมูลไม่ครบ");
 
-            // --- กฎข้อ 1: โต๊ด ให้สลับแค่ หน้า-หลัง ---
             if (currentType === 'โต๊ด') {
                 const reversedNum = num.split('').reverse().join('');
-                // ถ้าเป็นเลขตอง/คู่ เช่น 111 สลับแล้วเหมือนเดิม ให้มีแค่ 1 รายการ
                 const perms = (num === reversedNum) ? [num] : [num, reversedNum]; 
                 addGroupedItem(num, 'โต๊ด', price, perms);
                 renderCurrentBill();
                 return;
             }
 
-            // --- กฎข้อ 2: ประเภทอื่น ให้สลับทุกประตูตามปกติ ---
             const perms = getPerms(num);
             if(currentType === 'บน+ล่าง') { 
                 addGroupedItem(num, 'บน', price, perms); 
@@ -258,23 +255,39 @@
             currentItems = []; document.getElementById('custName').value = ""; document.getElementById('edit-mode-tag').classList.add('hidden'); renderCurrentBill();
         }
 
-        // 🌟 อัปเดตระบบตรวจรางวัลให้คูณจำนวนตัวที่ถูกในการสลับ
+        // 🌟 อัปเดตเงื่อนไขให้ครอบคลุม "3 หน้า" ในการตรวจลูปเดียวกับโต๊ด/สลับชุด
         function autoCheckPrizes() {
-            const w3T = document.getElementById('win3Top').value, w2T = document.getElementById('win2Top').value, w2B = document.getElementById('win2Bottom').value;
-            if(!w3T && !w2T && !w2B) return alert("กรุณากรอกรางวัล");
+            const w3T = document.getElementById('win3Top').value, 
+                  w3F = document.getElementById('win3Front').value, 
+                  w2T = document.getElementById('win2Top').value, 
+                  w2B = document.getElementById('win2Bottom').value;
+                  
+            if(!w3T && !w3F && !w2T && !w2B) return alert("กรุณากรอกรางวัล");
+            
             let data = JSON.parse(localStorage.getItem('suda_history') || '[]');
             
             data.forEach(bill => {
                 bill.items.forEach(item => {
                     item.isWon = false;
-                    let winMultiplier = 0; // เก็บว่าในกลุ่มสลับ ถูกกี่ตัว
+                    let winMultiplier = 0; 
                     
                     item.perms.forEach(pNum => {
                         let matched = false;
+                        
+                        // กฎรางวัลปกติ
                         if(pNum === w3T && item.type === "บน") matched = true;
                         if(pNum === w2T && item.type === "บน") matched = true;
                         if(pNum === w2B && item.type === "ล่าง") matched = true;
-                        if(item.type === "โต๊ด" && w3T && pNum.split('').sort().join('') === w3T.split('').sort().join('')) matched = true;
+                        
+                        // 🌟 กฎ 3 ตัวหน้า (ถ้าระบุเป็นล่าง หรือ ระบุหน้า แล้วตรงกับช่อง 3 หน้า)
+                        if(pNum === w3F && (item.type === "ล่าง" || item.type === "ชุด" || item.type === "หน้า")) matched = true;
+
+                        // 🌟 กฎของโต๊ด (เช็คทั้ง 3 บน และ 3 หน้า)
+                        if(item.type === "โต๊ด" && pNum.length === 3) {
+                            const sortedP = pNum.split('').sort().join('');
+                            if (w3T && sortedP === w3T.split('').sort().join('')) matched = true;
+                            if (w3F && sortedP === w3F.split('').sort().join('')) matched = true;
+                        }
                         
                         if(matched) winMultiplier++;
                     });
@@ -282,7 +295,7 @@
                     if(winMultiplier > 0) {
                         item.isWon = true;
                         const rate = (typeof RATES[item.type] === 'function') ? RATES[item.type](item.num) : RATES[item.type];
-                        item.potentialWin = item.pricePerItem * rate * winMultiplier; // สมมติถูก 2 ตัวในกลุ่ม ก็ได้รางวัล 2 เด้ง
+                        item.potentialWin = item.pricePerItem * rate * winMultiplier; 
                     } else {
                         item.potentialWin = 0;
                     }
@@ -290,7 +303,7 @@
                 bill.totalWin = bill.items.reduce((s, i) => i.isWon ? s + i.potentialWin : s, 0);
             });
             localStorage.setItem('suda_history', JSON.stringify(data));
-            renderDashboard(); alert("ตรวจรางวัลเสร็จสิ้น! ✅");
+            renderDashboard(); alert("ตรวจรางวัลและแยกสรุปรายการเสร็จสิ้น! ✅");
         }
 
         function renderDashboard() {
@@ -322,7 +335,7 @@
                         <div class="pastel-card p-4 border-l-8 border-green-500 shadow-md">
                             <div class="flex justify-between items-center border-b pb-2 mb-2">
                                 <div><span class="text-2xl font-black text-indigo-600">${w.num}</span> <span class="text-[10px] bg-indigo-50 text-indigo-400 px-2 py-1 rounded-lg uppercase ml-1 font-bold">${w.type}</span></div>
-                                <div class="text-right"><p class="text-[9px] text-gray-400">ถูกทั้งหมด ${w.bills.length} บิล</p><p class="text-lg font-black text-green-600">฿${w.totalPrize.toLocaleString()}</p></div>
+                                <div class="text-right"><p class="text-[9px] text-gray-400">ถูกทั้งหมด ${w.bills.length} บิล</p><p class="text-lg font-black text-green-600">จ่าย ฿${w.totalPrize.toLocaleString()}</p></div>
                             </div>
                             <div class="space-y-1">
                                 ${w.bills.map(b => `<div class="flex justify-between text-[11px] text-gray-500"><span>${b.name}</span><span class="font-bold">ซื้อ ฿${b.price.toLocaleString()}</span></div>`).join('')}
