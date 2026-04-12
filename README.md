@@ -69,11 +69,16 @@
 
 ## 📦 Deploy ไป Vercel
 
+แอปนี้เป็นเว็บสเตติก พร้อม deploy บน Vercel ได้ทันทีด้วย `vercel.json` ที่มีการตั้งค่าสำหรับ static site.
+
 ```bash
 git clone <your-repo>
 cd app-suda
-# Upload ไป Vercel ผ่าน GitHub
+npx vercel login
+npx vercel --prod
 ```
+
+หรือเชื่อมต่อ repo นี้ใน Vercel dashboard แล้วเลือก branch `main` เพื่อ deploy อัตโนมัติ.
 
 ## ⚡ Performance Tips
 
