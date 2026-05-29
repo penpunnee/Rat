@@ -252,11 +252,11 @@
         }
 
         function generatePermsForItem(item) {
-            if(item.isGrouped) return getPerms(item.num);
-            else return [item.num];
+            if(item.perms) return item.perms;
+            if(item.isGrouped) return getPerms(item.realNum || item.num.replace(' (สลับ)', ''));
+            return [item.num];
         }
 
-        // --- คืนค่าสลับชุดแบบ 6 ประตูเต็มๆ ---
         function handleSmartReverse() {
             const num = document.getElementById('lotNumber').value.trim();
             const price = parseFloat(document.getElementById('lotPrice').value) || 0;
@@ -286,7 +286,7 @@
             clearInputs();
         }
 
-        // --- เพิ่มฟังก์ชันใหม่ ตรง+สลับ ลง 2 บรรทัด ---
+        // --- เพิ่มเงื่อนไขบังคับเรท 80 ให้ส่วนสลับของปุ่ม ตรง+สลับ ---
         function handleStraightAndReverse() {
             const num = document.getElementById('lotNumber').value.trim();
             const price = parseFloat(document.getElementById('lotPrice').value) || 0;
@@ -294,9 +294,14 @@
             if(!/^\d+$/.test(num)) return alert("เลขต้องเป็นตัวเลขเท่านั้น");
 
             const perms = getPerms(num);
+            const forcedRate = (num.length === 3) ? 80 : null; // บังคับคูณ 80 ถ้าเป็นเลข 3 ตัว
+
             const processType = (t) => {
-                addSingleItem(num, t, price); // ลงตัวตรง 1 ประตู
-                addGroupedItem(num, t, price, perms); // ลงแบบสลับให้เต็มประตู
+                // 1. ลงตัวตรง 1 ประตู (ราคา 1x)
+                addSingleItem(num, t, price); 
+                
+                // 2. ลงตัวสลับ 6 ประตูเต็ม (ราคา 6x) พร้อมรับ forcedRate = 80
+                addSwappedItem(num, t, price, perms, forcedRate); 
             };
 
             if(currentType === 'บน+ล่าง') { 
@@ -310,7 +315,8 @@
             else if (currentType === 'โต๊ด') {
                 const reversedNum = num.split('').reverse().join('');
                 const p = (num === reversedNum) ? [num] : [num, reversedNum]; 
-                addGroupedItem(num, 'โต๊ด', price, p);
+                addSingleItem(num, 'โต๊ด', price);
+                addSwappedItem(num, 'โต๊ด', price, p, forcedRate);
             }
             else { 
                 processType(currentType); 
@@ -319,7 +325,6 @@
             clearInputs();
         }
 
-        // --- กดลงบิลแบบปกติ (เต็ง/ตัวตรง) ---
         function addItem() {
             const num = document.getElementById('lotNumber').value.trim(), price = parseFloat(document.getElementById('lotPrice').value) || 0;
             if (!currentType || !num || price <= 0) return alert("ข้อมูลไม่ครบ");
@@ -353,19 +358,38 @@
             currentItems.push({ num: num, type: type, pricePerItem: price, price: price, potentialWin: price * rate, isWon: false, isGrouped: false, totalCount: 1, permsCount: 1 });
         }
 
-        function addGroupedItem(originalNum, type, pricePerItem, perms) {
+        function addGroupedItem(originalNum, type, pricePerItem, perms, forceRate = null) {
             const totalCount = perms.length;
             const totalPrice = pricePerItem * totalCount; 
-            const rate = (typeof RATES[type] === 'function') ? RATES[type](originalNum) : RATES[type];
-            currentItems.push({ num: originalNum, type: type, pricePerItem: pricePerItem, price: totalPrice, potentialWin: pricePerItem * rate, isWon: false, isGrouped: true, totalCount: totalCount, permsCount: totalCount });
+            const rate = forceRate || ((typeof RATES[type] === 'function') ? RATES[type](originalNum) : RATES[type]);
+            currentItems.push({ num: originalNum, type: type, pricePerItem: pricePerItem, price: totalPrice, potentialWin: pricePerItem * rate, isWon: false, isGrouped: true, totalCount: totalCount, permsCount: totalCount, forcedRate: forceRate });
+        }
+
+        function addSwappedItem(originalNum, type, pricePerItem, swappedArray, forceRate = null) {
+            const totalCount = swappedArray.length;
+            const totalPrice = pricePerItem * totalCount; 
+            const rate = forceRate || ((typeof RATES[type] === 'function') ? RATES[type](originalNum) : RATES[type]);
+            currentItems.push({ 
+                num: originalNum + ' (สลับ)', 
+                realNum: originalNum,
+                type: type, 
+                pricePerItem: pricePerItem, 
+                price: totalPrice, 
+                potentialWin: pricePerItem * rate, 
+                isWon: false, 
+                isGrouped: true, 
+                perms: swappedArray,
+                totalCount: totalCount,
+                forcedRate: forceRate
+            });
         }
 
         function renderCurrentBill() {
             const list = document.getElementById('itemList');
             list.innerHTML = "";
             currentItems.forEach((item, index) => {
-                const badge = item.isGrouped ? `<span class="bg-indigo-100 text-indigo-500 text-[9px] px-1.5 py-0.5 rounded ml-2 font-bold">สลับ ${item.totalCount}</span>` : '';
-                const permsDisplay = item.isGrouped ? getPerms(item.num).join(', ') : item.num;
+                const badge = item.isGrouped ? `<span class="bg-indigo-100 text-indigo-500 text-[9px] px-1.5 py-0.5 rounded ml-2 font-bold">${item.totalCount} ประตู</span>` : '';
+                const permsDisplay = item.perms ? item.perms.join(', ') : item.num;
                 const subtext = item.isGrouped ? `<p class="text-[9px] text-gray-400 mt-1 truncate w-48">(${permsDisplay})</p>` : '';
                 const priceDetail = item.isGrouped ? `<p class="text-[9px] text-gray-400">(${item.totalCount}x฿${item.pricePerItem})</p>` : '';
 
@@ -427,7 +451,9 @@
                     });
                     if(winMultiplier > 0) {
                         item.isWon = true;
-                        const rate = (typeof RATES[item.type] === 'function') ? RATES[item.type](item.num) : RATES[item.type];
+                        const realN = item.realNum || item.num.replace(' (สลับ)', '');
+                        // ใช้ forcedRate ถ้ามี, ถ้าไม่มีค่อยไปดึงเรทปกติ
+                        const rate = item.forcedRate || ((typeof RATES[item.type] === 'function') ? RATES[item.type](realN) : RATES[item.type]);
                         item.potentialWin = item.pricePerItem * rate * winMultiplier; 
                     } else { item.potentialWin = 0; }
                 });
@@ -570,7 +596,8 @@
         function toggleWin(idx) { 
             currentItems[idx].isWon = !currentItems[idx].isWon; 
             if(currentItems[idx].isWon) {
-                const rate = (typeof RATES[currentItems[idx].type] === 'function') ? RATES[currentItems[idx].type](currentItems[idx].num) : RATES[currentItems[idx].type];
+                const realN = currentItems[idx].realNum || currentItems[idx].num.replace(' (สลับ)', '');
+                const rate = currentItems[idx].forcedRate || ((typeof RATES[currentItems[idx].type] === 'function') ? RATES[currentItems[idx].type](realN) : RATES[currentItems[idx].type]);
                 currentItems[idx].potentialWin = currentItems[idx].pricePerItem * rate;
             }
             renderCurrentBill(); 
