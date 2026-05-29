@@ -75,7 +75,6 @@
                     <button onclick="toggleType('ล่าง', this)" class="type-btn p-3 rounded-xl border-2 text-[10px] font-bold bg-white text-gray-400 border-gray-100 transition-all" data-val="ล่าง">ล่าง (60)</button>
                     <button onclick="toggleType('บน+ล่าง', this)" class="type-btn p-3 rounded-xl border-2 text-[10px] font-bold bg-white text-gray-400 border-gray-100 transition-all" data-val="บน+ล่าง">บน+ล่าง</button>
                     <button onclick="toggleType('อั้น', this)" class="type-btn p-3 rounded-xl border-2 text-[10px] font-bold bg-white text-gray-400 border-gray-100 transition-all" data-val="อั้น">อั้น (30)</button>
-                    <button onclick="toggleType('ชุด', this)" class="type-btn p-3 rounded-xl border-2 text-[10px] font-bold bg-white text-gray-400 border-gray-100 transition-all" data-val="ชุด">ชุดพิเศษ</button>
                 </div>
                 <input type="number" id="lotPrice" class="col-span-12 bg-orange-50 p-4 rounded-xl text-2xl font-black text-orange-600 outline-none border-2 border-orange-100" placeholder="ราคา" inputmode="decimal" min="0" step="1">
             </div>
@@ -225,7 +224,7 @@
         let currentItems = [];
         let currentType = "";
         let editingBillId = null;
-        const RATES = { "บน": (n) => n.length === 3 ? 500 : 60, "ล่าง": 60, "โต๊ด": 80, "อั้น": 30, "บน+ล่าง": 60, "ชุด": 60 };
+        const RATES = { "บน": (n) => n.length === 3 ? 500 : 60, "ล่าง": 60, "โต๊ด": 80, "อั้น": 30, "บน+ล่าง": 60 };
 
         function changePage(pageId) {
             document.getElementById('page1').classList.add('hidden');
@@ -379,7 +378,7 @@
                         if(pNum === w3T && item.type === "บน") matched = true;
                         if(pNum === w2T && item.type === "บน") matched = true;
                         if(pNum === w2B && item.type === "ล่าง") matched = true;
-                        if(pNum === w3F && (item.type === "ล่าง" || item.type === "ชุด" || item.type === "หน้า")) matched = true;
+                        if(pNum === w3F && (item.type === "ล่าง" || item.type === "หน้า")) matched = true;
                         if(item.type === "โต๊ด" && pNum.length === 3) {
                             const sortedP = pNum.split('').sort().join('');
                             if (w3T && sortedP === w3T.split('').sort().join('')) matched = true;
@@ -468,7 +467,7 @@
 
                         if(target) {
                             target.totalBuy += item.pricePerItem;
-                            if(item.type === 'บน' || item.type === 'ชุด') target.top += item.pricePerItem;
+                            if(item.type === 'บน') target.top += item.pricePerItem;
                             else if(item.type === 'ล่าง') target.bottom += item.pricePerItem;
                             else if(item.type === 'โต๊ด') target.toad += item.pricePerItem;
                             else target.other += item.pricePerItem;
