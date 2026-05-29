@@ -74,6 +74,7 @@
                     <button onclick="toggleType('โต๊ด', this)" class="type-btn p-3 rounded-xl border-2 text-[10px] font-bold bg-white text-gray-400 border-gray-100 transition-all" data-val="โต๊ด">โต๊ด (80)</button>
                     <button onclick="toggleType('ล่าง', this)" class="type-btn p-3 rounded-xl border-2 text-[10px] font-bold bg-white text-gray-400 border-gray-100 transition-all" data-val="ล่าง">ล่าง (60)</button>
                     <button onclick="toggleType('บน+ล่าง', this)" class="type-btn p-3 rounded-xl border-2 text-[10px] font-bold bg-white text-gray-400 border-gray-100 transition-all" data-val="บน+ล่าง">บน+ล่าง</button>
+                    <button onclick="toggleType('บน+โต๊ด', this)" class="type-btn p-3 rounded-xl border-2 text-[10px] font-bold bg-white text-gray-400 border-gray-100 transition-all" data-val="บน+โต๊ด">บน+โต๊ด</button>
                     <button onclick="toggleType('อั้น', this)" class="type-btn p-3 rounded-xl border-2 text-[10px] font-bold bg-white text-gray-400 border-gray-100 transition-all" data-val="อั้น">อั้น (30)</button>
                 </div>
                 <input type="number" id="lotPrice" class="col-span-12 bg-orange-50 p-4 rounded-xl text-2xl font-black text-orange-600 outline-none border-2 border-orange-100" placeholder="ราคา" inputmode="decimal" min="0" step="1">
@@ -285,6 +286,10 @@
                 addGroupedItem(num, 'บน', price, perms); 
                 addGroupedItem(num, 'ล่าง', price, perms); 
             }
+            else if(currentType === 'บน+โต๊ด') {
+                addGroupedItem(num, 'บน', price, perms); // สลับชุดบน 6 ประตู
+                addSingleItem(num, 'โต๊ด', price); // โต๊ด (ไม่ต้องสลับเพราะโต๊ดครอบคลุมอยู่แล้ว)
+            }
             else { 
                 addGroupedItem(num, currentType, price, perms); 
             }
@@ -300,8 +305,19 @@
             if (!currentType || !num || price <= 0) return alert("ข้อมูลไม่ครบ");
             if(!/^\d+$/.test(num)) return alert("เลขต้องเป็นตัวเลขเท่านั้น");
             if(num.length < 2 || num.length > 3) return alert("ต้องเลข 2-3 ตัวเท่านั้น");
-            if(currentType === 'บน+ล่าง') { addSingleItem(num, 'บน', price); addSingleItem(num, 'ล่าง', price); }
-            else { addSingleItem(num, currentType, price); }
+            
+            if(currentType === 'บน+ล่าง') { 
+                addSingleItem(num, 'บน', price); 
+                addSingleItem(num, 'ล่าง', price); 
+            }
+            else if(currentType === 'บน+โต๊ด') {
+                addSingleItem(num, 'บน', price);
+                addSingleItem(num, 'โต๊ด', price);
+            }
+            else { 
+                addSingleItem(num, currentType, price); 
+            }
+            
             document.getElementById('lotNumber').value = "";
             document.getElementById('lotPrice').value = "";
             currentType = "";
