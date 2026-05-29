@@ -189,7 +189,6 @@
                 navigator.serviceWorker.register('sw.js', { scope: '/' })
                     .then(reg => {
                         console.log('✅ Service Worker registered:', reg);
-                        // Check for updates periodically
                         setInterval(() => reg.update(), 60000);
                     })
                     .catch(err => console.warn('⚠️ Service Worker registration failed:', err));
@@ -259,8 +258,9 @@
         }
 
         function generatePermsForItem(item) {
-            if(item.isGrouped) return getPerms(item.num);
-            else return [item.num];
+            if(item.perms) return item.perms;
+            if(item.isGrouped) return getPerms(item.realNum || item.num.replace(' (สลับ)', ''));
+            return [item.num];
         }
 
         function handleSmartReverse() {
@@ -271,28 +271,42 @@
 
             if (currentType === 'โต๊ด') {
                 const reversedNum = num.split('').reverse().join('');
-                const perms = (num === reversedNum) ? [num] : [num, reversedNum]; 
-                addGroupedItem(num, 'โต๊ด', price, perms);
-                renderCurrentBill();
+                if(num !== reversedNum) {
+                    addSingleItem(num, 'โต๊ด', price);
+                    addSingleItem(reversedNum, 'โต๊ด', price);
+                } else {
+                    addSingleItem(num, 'โต๊ด', price);
+                }
                 document.getElementById('lotNumber').value = "";
                 document.getElementById('lotPrice').value = "";
                 currentType = "";
                 document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('type-btn-active'));
+                renderCurrentBill();
                 return;
             }
 
             const perms = getPerms(num);
+            const swapped = perms.filter(p => p !== num); // กรองเอาเฉพาะตัวที่ไม่ใช่ตัวตรง
+
+            const processType = (t) => {
+                addSingleItem(num, t, price); // เพิ่มตัวตรง (เต็ง)
+                if (swapped.length > 0) {
+                    addSwappedItem(num, t, price, swapped); // เพิ่มกลุ่มตัวสลับที่เหลือ
+                }
+            };
+
             if(currentType === 'บน+ล่าง') { 
-                addGroupedItem(num, 'บน', price, perms); 
-                addGroupedItem(num, 'ล่าง', price, perms); 
+                processType('บน'); 
+                processType('ล่าง'); 
             }
             else if(currentType === 'บน+โต๊ด') {
-                addGroupedItem(num, 'บน', price, perms); // สลับชุดบน 6 ประตู
-                addSingleItem(num, 'โต๊ด', price); // โต๊ด (ไม่ต้องสลับเพราะโต๊ดครอบคลุมอยู่แล้ว)
+                processType('บน');
+                addSingleItem(num, 'โต๊ด', price); // โต๊ด (ลงแยกเป็นบรรทัดเดียวอยู่แล้ว)
             }
             else { 
-                addGroupedItem(num, currentType, price, perms); 
+                processType(currentType); 
             }
+            
             document.getElementById('lotNumber').value = "";
             document.getElementById('lotPrice').value = "";
             currentType = "";
@@ -330,19 +344,30 @@
             currentItems.push({ num: num, type: type, pricePerItem: price, price: price, potentialWin: price * rate, isWon: false, isGrouped: false, totalCount: 1, permsCount: 1 });
         }
 
-        function addGroupedItem(originalNum, type, pricePerItem, perms) {
-            const totalCount = perms.length;
+        function addSwappedItem(originalNum, type, pricePerItem, swappedArray) {
+            const totalCount = swappedArray.length;
             const totalPrice = pricePerItem * totalCount; 
             const rate = (typeof RATES[type] === 'function') ? RATES[type](originalNum) : RATES[type];
-            currentItems.push({ num: originalNum, type: type, pricePerItem: pricePerItem, price: totalPrice, potentialWin: pricePerItem * rate, isWon: false, isGrouped: true, totalCount: totalCount, permsCount: totalCount });
+            currentItems.push({ 
+                num: originalNum + ' (สลับ)', 
+                realNum: originalNum,
+                type: type, 
+                pricePerItem: pricePerItem, 
+                price: totalPrice, 
+                potentialWin: pricePerItem * rate, 
+                isWon: false, 
+                isGrouped: true, 
+                perms: swappedArray,
+                totalCount: totalCount 
+            });
         }
 
         function renderCurrentBill() {
             const list = document.getElementById('itemList');
             list.innerHTML = "";
             currentItems.forEach((item, index) => {
-                const badge = item.isGrouped ? `<span class="bg-indigo-100 text-indigo-500 text-[9px] px-1.5 py-0.5 rounded ml-2 font-bold">สลับ ${item.totalCount}</span>` : '';
-                const permsDisplay = item.isGrouped ? getPerms(item.num).join(', ') : item.num;
+                const badge = item.isGrouped ? `<span class="bg-indigo-100 text-indigo-500 text-[9px] px-1.5 py-0.5 rounded ml-2 font-bold">${item.totalCount} ประตู</span>` : '';
+                const permsDisplay = item.perms ? item.perms.join(', ') : item.num;
                 const subtext = item.isGrouped ? `<p class="text-[9px] text-gray-400 mt-1 truncate w-48">(${permsDisplay})</p>` : '';
                 const priceDetail = item.isGrouped ? `<p class="text-[9px] text-gray-400">(${item.totalCount}x฿${item.pricePerItem})</p>` : '';
 
@@ -532,7 +557,7 @@
             const table = document.getElementById(tableId);
             table.innerHTML = `<tr class="text-gray-400 text-[10px] border-b"><th>เลข</th><th>ประเภท</th><th class="text-right">ราคา</th></tr>`;
             currentItems.forEach(i => {
-                const tag = i.isGrouped ? `<span class="text-[8px] text-indigo-400 ml-1">(สลับ ${i.totalCount})</span>` : '';
+                const tag = i.isGrouped ? `<span class="text-[8px] text-indigo-400 ml-1">(${i.totalCount} ประตู)</span>` : '';
                 table.innerHTML += `<tr class="border-b border-gray-50"><td class="py-2 font-bold">${i.num} ${tag}</td><td class="text-gray-400 text-[9px] uppercase">${i.type}</td><td class="text-right font-bold text-indigo-400">${i.price}</td></tr>`;
             });
             const total = currentItems.reduce((s, i) => s + i.price, 0), disc = total * 0.27, win = currentItems.reduce((s, i) => i.isWon ? s + i.potentialWin : s, 0);
