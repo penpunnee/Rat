@@ -76,7 +76,6 @@
                     <button onclick="toggleType('ล่าง', this)" class="type-btn p-3 rounded-xl border-2 text-[10px] font-bold bg-white text-gray-400 border-gray-100 transition-all" data-val="ล่าง">ล่าง (60)</button>
                     <button onclick="toggleType('บน+ล่าง', this)" class="type-btn p-3 rounded-xl border-2 text-[10px] font-bold bg-white text-gray-400 border-gray-100 transition-all" data-val="บน+ล่าง">บน+ล่าง</button>
                     <button onclick="toggleType('บน+โต๊ด', this)" class="type-btn p-3 rounded-xl border-2 text-[10px] font-bold bg-white text-gray-400 border-gray-100 transition-all" data-val="บน+โต๊ด">บน+โต๊ด</button>
-                    <button onclick="toggleType('อั้น', this)" class="type-btn p-3 rounded-xl border-2 text-[10px] font-bold bg-white text-gray-400 border-gray-100 transition-all" data-val="อั้น">อั้น (30)</button>
                 </div>
                 <input type="number" id="lotPrice" class="col-span-12 bg-orange-50 p-4 rounded-xl text-2xl font-black text-orange-600 outline-none border-2 border-orange-100" placeholder="ราคา" inputmode="decimal" min="0" step="1">
             </div>
@@ -218,7 +217,7 @@
         let currentItems = [];
         let currentType = "";
         let editingBillId = null;
-        const RATES = { "บน": (n) => n.length === 3 ? 500 : 60, "ล่าง": 60, "โต๊ด": 80, "อั้น": 30, "บน+ล่าง": 60 };
+        const RATES = { "บน": (n) => n.length === 3 ? 500 : 60, "ล่าง": 60, "โต๊ด": 80, "บน+ล่าง": 60 };
 
         function changePage(pageId) {
             document.getElementById('page1').classList.add('hidden');
@@ -362,7 +361,7 @@
             const totalCount = perms.length;
             const totalPrice = pricePerItem * totalCount; 
             const rate = forceRate || ((typeof RATES[type] === 'function') ? RATES[type](originalNum) : RATES[type]);
-            currentItems.push({ num: originalNum, type: type, pricePerItem: pricePerItem, price: totalPrice, potentialWin: pricePerItem * rate, isWon: false, isGrouped: true, totalCount: totalCount, permsCount: totalCount, forcedRate: forceRate });
+            currentItems.push({ num: originalNum, type: type, pricePerItem: pricePerItem, price: totalPrice, potentialWin: pricePerItem * rate, isWon: false, isGrouped: true, perms: perms, totalCount: totalCount, permsCount: totalCount, forcedRate: forceRate });
         }
 
         function addSwappedItem(originalNum, type, pricePerItem, swappedArray, forceRate = null) {
