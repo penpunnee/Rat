@@ -1,98 +1,66 @@
-# 🎰 Suda Lottery - Pro Analytics
+# Suda Lottery 🎯
 
-แอปพลิเคชันจัดการและวิเคราะห์ข้อมูลหวยพร้อมระบบบิลอัตโนมัติ
+แอปจัดการลอตเตอรี่ — ออกบิล / สรุปงวด / สรุปโพย / รายบุคคล / เทียบงวด
 
-## ✨ ฟีเจอร์หลัก
+## โครงสร้างโปรเจกต์
 
-- **ออกบิล** - เพิ่มรายการเลขหวยกลุ่มละกรรม แบบบน/ล่าง/โต๊ด
-- **สลับชุด** - สร้างการเรียงสับปะวนอัตโนมัติ
-- **ตรวจรางวัล** - ตรวจสอบเลขที่ถูกรางวัลและคำนวณอัตโนมัติ
-- **สรุปงวด** - แสดงยอดรวม ค่าคอม 27% กำไรสุทธิ
-- **สรุปโพยเลข** - วิเคราะห์ยอดขายแยกตามประเภท (2 ตัว/3 ตัว)
-- **ส่งออกบิล** - ดาวน์โหลดบิลเป็นรูป PNG
-- **ค้นหาและแก้ไข** - ค้นหาบิล แก้ไข ลบข้อมูล
-- **PWA Support** - ติดตั้งได้บนมือถือเหมือน Native App
-- **Offline Support** - ใช้งานได้แม้ไม่มี Internet
-
-## 🛠️ เทคโนโลยี
-
-- HTML5 + JavaScript (Vanilla)
-- Tailwind CSS + Font Awesome
-- LocalStorage (เก็บข้อมูลในอุปกรณ์)
-- html2canvas (ส่งออกบิลเป็นรูป)
-- Service Worker (PWA + Offline)
-
-## 📱 วิธีติดตั้งบนมือถือ
-
-### iOS (iPhone)
-1. เปิด Safari และไปที่ `https://[your-domain]`
-2. แตะ **Share** → **Add to Home Screen**
-3. ตั้งชื่อแล้ว **Add**
-4. ได้แล้ว! แตะ icon บนหน้าแรก
-
-### Android
-1. เปิด Chrome และไปที่ `https://[your-domain]`
-2. แตะ **⋮** (menu) → **Install app**
-3. หรือ **Add to Home Screen**
-4. ได้แล้ว! ใช้งาน full screen
-
-## 💻 วิธีใช้
-
-1. เปิดไฟล์ `index.html` ในเบราว์เซอร์
-2. กรอกชื่อลูกค้า เลขหวย ประเภท และราคา
-3. คลิก "เพิ่มรายการลงบิล"
-4. บันทึกบิลเข้าหน้าสรุป
-5. ตรวจรางวัลและดูการวิเคราะห์
-
-## 📊 อัตราหวย
-
-| ประเภท | อัตรา |
-|--------|-------|
-| บน (3 ตัว) | 500 บาท |
-| บน (2 ตัว) | 60 บาท |
-| ล่าง | 60 บาท |
-| โต๊ด | 80 บาท |
-| อั้น | 30 บาท |
-| ชุด | 60 บาท |
-
-## 💾 ข้อมูล
-
-- ข้อมูลทั้งหมดเก็บในโครงสร้าง `suda_history` ของเบราว์เซอร์ (LocalStorage)
-- ไม่ขึ้น Server - ข้อมูลจะเก็บได้ 50+ บิล
-- สามารถ Export เป็น JSON (แนะนำ backup)
-
-## 🔧 ไฟล์ที่สำคัญ
-
-- `index.html` - หน้าหลักของแอป
-- `manifest.json` - ตั้งค่า PWA
-- `sw.js` - Service Worker (offline support)
-
-## 📦 Deploy ไป Vercel
-
-แอปนี้เป็นเว็บสเตติก พร้อม deploy บน Vercel ได้ทันทีด้วย `vercel.json` ที่มีการตั้งค่าสำหรับ static site.
-
-```bash
-git clone <your-repo>
-cd app-suda
-npx vercel login
-npx vercel --prod
+```
+suda-lottery/
+├── index.html          ← หน้าเว็บหลัก (ทั้งแอปอยู่ในไฟล์เดียว)
+├── output.css          ← Tailwind CSS ที่ build แล้ว (generate อัตโนมัติ, ไม่ต้องแก้มือ)
+├── src/input.css       ← ต้นทาง Tailwind (แก้ตรงนี้ถ้าจะปรับ base style)
+├── tailwind.config.js  ← ตั้งค่า Tailwind ให้ scan index.html หา class
+├── package.json        ← คำสั่ง build
+└── vercel.json         ← ตั้งค่าให้ Vercel build อัตโนมัติตอน deploy
 ```
 
-หรือเชื่อมต่อ repo นี้ใน Vercel dashboard แล้วเลือก branch `main` เพื่อ deploy อัตโนมัติ.
+## รันทดสอบในเครื่อง (ก่อน deploy)
 
-## ⚡ Performance Tips
+```bash
+npm install
+npm run build:css     # build Tailwind CSS เป็น output.css
+```
 
-1. ลบข้อมูล 30+ บิลที่เก่า - ใช้ปุ่ม **Clear All Data**
-2. Export ข้อมูลเพื่อ backup
-3. ใช้ Chrome ที่ up-to-date สำหรับ PWA ที่ดีที่สุด
+จากนั้นเปิด `index.html` ด้วย Live Server (VS Code extension) หรือ:
 
-## 🐛 ปัญหาที่รู้จัก
+```bash
+python3 -m http.server 8000
+# เปิด http://localhost:8000
+```
 
-- ถ้า LocalStorage เต็ม → แจ้ง "LocalStorage เต็ม" ให้ Clear Data
-- html2canvas อาจ slow บน device เก่า
-- iPhone อาจต้อง Settings > Safari > Block Pop-ups = OFF
+## ขั้นตอน Deploy ขึ้น GitHub
 
----
-**สร้างด้วย ❤️ สำหรับการจัดการหวยอย่างมืออาชีพ**
+```bash
+git init
+git add .
+git commit -m "Initial commit - Suda Lottery"
+git branch -M main
+git remote add origin https://github.com/<username>/suda-lottery.git
+git push -u origin main
+```
 
-**ติดตั้ง PWA ได้ที่:** 📲 **Add to Home Screen**
+> **หมายเหตุ:** `node_modules/` และ `output.css` ที่ build แล้วจะไม่ถูก push ขึ้น GitHub (อยู่ใน `.gitignore`) — Vercel จะ build ให้เองตอน deploy
+
+## ขั้นตอน Deploy ขึ้น Vercel
+
+1. เข้า [vercel.com](https://vercel.com) → Sign in ด้วย GitHub
+2. กด **Add New → Project**
+3. เลือก repo `suda-lottery` ที่เพิ่ง push ขึ้นไป
+4. **Framework Preset:** เลือก **Other** (เพราะไม่ใช่ React/Next.js)
+5. ปล่อยค่า Build Command / Output Directory ตามที่ตั้งไว้ใน `vercel.json` (ไม่ต้องแก้)
+6. กด **Deploy**
+
+รอ 30 วินาที — ได้ลิงก์ `https://suda-lottery-xxxx.vercel.app` ใช้งานได้ทันที
+
+## ถ้าแก้ index.html แล้วอยากเพิ่ม Tailwind class ใหม่
+
+แค่แก้ `index.html` ตามปกติ (เพิ่ม class ใน `class="..."` หรือใน JS string) แล้ว push ขึ้น GitHub — Vercel จะรัน `npm run build:css` ใหม่ให้อัตโนมัติทุกครั้งที่ deploy ไม่ต้อง build เองในเครื่อง
+
+ถ้าอยากดูผลลัพธ์ในเครื่องก่อน push:
+```bash
+npm run build:css
+```
+
+## ข้อมูลเก็บที่ไหน
+
+ข้อมูลบิล/ลูกค้า/งวด/เลขรางวัล เก็บใน **localStorage ของเบราว์เซอร์** (ไม่มี backend/database) — ข้อมูลจะอยู่เฉพาะเบราว์เซอร์/อุปกรณ์ที่ใช้งาน ถ้าเปลี่ยนเครื่องหรือล้าง cache ข้อมูลจะหาย แนะนำให้ export Excel เก็บสำรองเป็นระยะ
