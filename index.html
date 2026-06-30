@@ -71,8 +71,8 @@
         #compare-print-doc td, #compare-print-doc th { border: 1px solid #555; padding: 5px 8px; text-align: center; font-size: 12px; white-space: nowrap; line-height: 1.4; }
         #print-doc th, #personal-print-doc th, #compare-print-doc th { background: #f0f0f0; font-weight: bold; }
         #print-doc .section-title, #personal-print-doc .section-title, #compare-print-doc .section-title { font-weight: bold; font-size: 14px; margin: 10px 0 6px; }
-        #print-doc .summary-line, #personal-print-doc .summary-line, #compare-print-doc .summary-line { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; padding: 3px 0; max-width: 280px; }
-        #print-doc .underline-val, #personal-print-doc .underline-val, #compare-print-doc .underline-val { border-bottom: 1px solid #333; min-width: 80px; text-align: right; display:inline-block; padding-right:4px; }
+        #print-doc .summary-line, #personal-print-doc .summary-line, #compare-print-doc .summary-line { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; font-size: 12px; padding: 5px 0; width: 100%; }
+        #print-doc .underline-val, #personal-print-doc .underline-val, #compare-print-doc .underline-val { border-bottom: 1px solid #333; min-width: 90px; text-align: right; flex-shrink: 0; white-space: nowrap; padding-right: 4px; }
         #print-doc .double-underline, #personal-print-doc .double-underline, #compare-print-doc .double-underline { border-bottom: 3px double #333; }
     </style>
 </head>
@@ -1302,7 +1302,7 @@
 
             const ul = (n,bold=false) => `<span class="underline-val ${bold?'double-underline':''}" style="${bold?'font-weight:bold':''}">${n.toLocaleString()}</span>`;
             const summaryBlock = `
-            <div style="margin-top:10px;font-size:12px;max-width:280px;margin-left:auto;">
+            <div style="margin-top:10px;font-size:12px;width:100%;margin-top:10px;">
                 <div class="summary-line"><span>ยอดซื้อ</span>${ul(gBuy)}</div>
                 <div class="summary-line"><span>หักหน้าบิล</span>${ul(Math.round(gComm))}</div>
                 <div class="summary-line"><span>ยอดจ่าย</span>${ul(Math.round(gRemain),true)}</div>
@@ -1331,7 +1331,7 @@
                 const net = Math.round(wRemain - gRemain);
                 const netColor = net < 0 ? 'color:red' : '';
                 const winSummary = `
-                <div style="margin-top:8px;font-size:12px;max-width:280px;">
+                <div style="margin-top:8px;font-size:12px;width:100%;">
                     <div class="summary-line"><span>ยอดถูก</span>${ul(wWin)}</div>
                     <div class="summary-line"><span>หักหน้าบิล</span>${ul(Math.round(wComm))}</div>
                     <div class="summary-line"><span>เหลือ</span>${ul(Math.round(wRemain))}</div>
@@ -1573,7 +1573,7 @@
                             </tr></thead>
                             <tbody>${winRows}</tbody>
                         </table>
-                        <div style="margin-top:8px;font-size:12px;max-width:280px;">
+                        <div style="margin-top:8px;font-size:12px;width:100%;">
                             <div class="summary-line"><span>ยอดถูก</span>${ul(wWin)}</div>
                             <div class="summary-line"><span>หักหน้าบิล</span>${ul(Math.round(wComm))}</div>
                             <div class="summary-line"><span>เหลือ</span>${ul(Math.round(wRemain))}</div>
@@ -1592,7 +1592,7 @@
                         <div class="section-title">${prefix} ${pB} — ${custName}</div>
                         ${prizeLabel ? `<p style="font-size:10px;color:#666;margin-bottom:4px;">🏆 รางวัล: ${prizeLabel}</p>` : ''}
                         <p style="color:#aaa;font-size:11px;">ไม่มีรายการถูกรางวัลงวด ${pB} ของ ${custName}</p>
-                        ${gRemainA > 0 ? `<div style="margin-top:6px;font-size:12px;max-width:280px;">
+                        ${gRemainA > 0 ? `<div style="margin-top:6px;font-size:12px;width:100%;">
                             <div class="summary-line"><span>ยอดถูก</span>${ul(0)}</div>
                             <div class="summary-line" style="border-top:1px dashed #ccc;padding-top:4px;margin-top:5px;">
                                 <span>หักยอด ${pA}</span>${ul(Math.round(gRemainA))}
@@ -1719,7 +1719,7 @@
                     </tr>`;
                     const net = Math.round(wRemain - gRemain);
                     const winSummary = `
-                    <div style="margin-top:8px;font-size:12px;max-width:280px;">
+                    <div style="margin-top:8px;font-size:12px;width:100%;">
                         <div class="summary-line"><span>ยอดถูก</span>${ul(wWin)}</div>
                         <div class="summary-line"><span>หักหน้าบิล</span>${ul(Math.round(wComm))}</div>
                         <div class="summary-line"><span>เหลือ</span>${ul(Math.round(wRemain))}</div>
