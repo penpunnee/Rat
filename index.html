@@ -118,13 +118,13 @@
             <div class="flex justify-between items-center mb-3">
                 <span class="text-[10px] text-indigo-300 uppercase tracking-widest font-bold">ค่าคอม</span>
                 <div class="flex gap-2">
-                    <button onclick="setCommRate(27, this)" id="rate-btn-27" class="rate-btn px-3 py-1 rounded-lg text-[11px] font-black bg-white/20 text-white border border-white/30">27%</button>
+                    <button onclick="setCommRate(27, this)" id="rate-btn-27" class="rate-btn px-3 py-1 rounded-lg text-[11px] font-black bg-white/10 text-white/50 border border-white/10">27%</button>
                     <button onclick="setCommRate(32, this)" id="rate-btn-32" class="rate-btn px-3 py-1 rounded-lg text-[11px] font-black bg-white/10 text-white/50 border border-white/10">32%</button>
                 </div>
             </div>
             <div class="space-y-2 text-sm">
                 <div class="flex justify-between opacity-70"><span>ยอดซื้อรวม:</span><span id="res-total">0.00</span></div>
-                <div class="flex justify-between text-yellow-400 font-bold"><span id="res-disc-label">ส่วนลดคอม (27%):</span><span id="res-disc">0.00</span></div>
+                <div class="flex justify-between text-yellow-400 font-bold"><span id="res-disc-label">ส่วนลดคอม (เลือก %):</span><span id="res-disc">0.00</span></div>
                 <div class="flex justify-between border-t border-indigo-800 pt-3 text-2xl font-black"><span>ยอดสุทธิ:</span><span id="res-net" class="text-white">0.00</span></div>
             </div>
             <button onclick="saveBillToSystem()" class="w-full mt-6 bg-green-500 text-white py-4 rounded-xl font-black shadow-lg hover:bg-green-600">บันทึกข้อมูลเข้าหน้าสรุป</button>
@@ -366,7 +366,7 @@
         let currentItems = [];
         let currentType = "";
         let editingBillId = null;
-        let COMM_RATE = 0.27; // ← ย้ายมาไว้บนสุด ทุกฟังก์ชันเข้าถึงได้
+        let COMM_RATE = null; // ต้องกดเลือก 27% หรือ 32% ก่อนบันทึก
         const RATES = { "บน": (n) => n.length === 3 ? 500 : 60, "ล่าง": 60, "โต๊ด": 80, "บน+ล่าง": 60 };
 
         function changePage(pageId) {
@@ -561,6 +561,7 @@
 
         function saveBillToSystem() {
             if(currentItems.length === 0) return alert("ไม่มีรายการ");
+            if(COMM_RATE === null) return alert("กรุณาเลือก % ค่าคอมก่อน (27% หรือ 32%)");
             const history = JSON.parse(localStorage.getItem('suda_history') || '[]');
             const billData = { id: editingBillId || Date.now(), customer: document.getElementById('custName').value || 'ทั่วไป', period: document.getElementById('billPeriod').value || '', items: [...currentItems], totalSales: currentItems.reduce((s, i) => s + i.price, 0), totalWin: currentItems.reduce((s, i) => i.isWon ? s + i.potentialWin : s, 0), time: new Date().toLocaleTimeString('th-TH'), commRate: COMM_RATE };
             if (editingBillId) { const idx = history.findIndex(b => b.id === editingBillId); history[idx] = billData; }
@@ -1228,11 +1229,12 @@
         // override calculateBill ให้ใช้ COMM_RATE แบบ dynamic
         function calculateBill() {
             const total = currentItems.reduce((s, i) => s + i.price, 0);
-            const disc  = total * COMM_RATE;
+            const rate  = COMM_RATE || 0;
+            const disc  = total * rate;
             const win   = currentItems.reduce((s, i) => i.isWon ? s + i.potentialWin : s, 0);
             document.getElementById('res-total').innerText = total.toLocaleString();
-            document.getElementById('res-disc').innerText  = "-" + disc.toLocaleString();
-            document.getElementById('res-net').innerText   = ((total - disc) - win).toLocaleString();
+            document.getElementById('res-disc').innerText  = COMM_RATE === null ? '-' : "-" + disc.toLocaleString();
+            document.getElementById('res-net').innerText   = COMM_RATE === null ? '-' : ((total - disc) - win).toLocaleString();
         }
 
         // ==================== PRINT SUMMARY ====================
