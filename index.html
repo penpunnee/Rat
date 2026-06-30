@@ -74,9 +74,14 @@
         #print-doc .summary-line, #personal-print-doc .summary-line, #compare-print-doc .summary-line { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; font-size: 12px; padding: 5px 0; width: 100%; }
         #print-doc .underline-val, #personal-print-doc .underline-val, #compare-print-doc .underline-val { border-bottom: 1px solid #333; min-width: 90px; text-align: right; flex-shrink: 0; white-space: nowrap; padding-right: 4px; }
         #print-doc .double-underline, #personal-print-doc .double-underline, #compare-print-doc .double-underline { border-bottom: 3px double #333; }
+
+        /* Toast */
+        #toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); background:#1e1b4b; color:#fff; padding:12px 24px; border-radius:999px; font-size:14px; font-weight:600; box-shadow:0 4px 20px rgba(0,0,0,0.25); opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:99999; white-space:nowrap; }
+        #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     </style>
 </head>
 <body class="min-h-screen pb-20">
+<div id="toast"></div>
 
     <div class="sticky top-0 z-50 bg-white shadow-sm flex text-xs">
         <button onclick="changePage('page1')" id="btn-page1" class="flex-1 py-4 font-bold nav-tab-active"><i class="fas fa-edit mb-1 block text-lg"></i>ออกบิล</button>
@@ -559,6 +564,14 @@
             document.getElementById('res-net').innerText = ((total - disc) - win).toLocaleString();
         }
 
+        function showToast(msg, duration=2000) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove('show'), duration);
+        }
+
         function saveBillToSystem() {
             if(currentItems.length === 0) return alert("ไม่มีรายการ");
             if(COMM_RATE === null) return alert("กรุณาเลือก % ค่าคอมก่อน (27% หรือ 32%)");
@@ -567,7 +580,7 @@
             if (editingBillId) { const idx = history.findIndex(b => b.id === editingBillId); history[idx] = billData; }
             else { history.push(billData); }
             localStorage.setItem('suda_history', JSON.stringify(history));
-            alert("บันทึกบิลเข้าหน้าสรุปแล้ว ✨");
+            showToast("บันทึกบิลเข้าหน้าสรุปแล้ว ✨");
             currentItems = []; 
             currentType = "";
             editingBillId = null;
