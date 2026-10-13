@@ -9,8 +9,7 @@
   · โน้ตข้างเคียงเป็น **symlink ไปถังกลาง** = ไฟล์เดียวกัน **ห้ามแทนที่ด้วยสำเนา**
 - **จบเซสชัน → จดที่ commit message + `README.md`**
   **ห้ามจดเนื้อหาลง memory** (memory ไม่มี diff ตรวจย้อนไม่ได้ · git ตรวจได้ · remote `penpunnee/Rat`)
-- กฎข้ามโปรเจกต์ (Iron Laws · "เครื่องมือวัดโกหก" · ทางเข้า NAS/Pi · วิธีทำงานกับ user)
-  อยู่ `~/.claude/CLAUDE.md` ซึ่งโหลดทุกที่อยู่แล้ว — **ห้ามก๊อปมาซ้ำที่นี่**
+- Iron Laws อยู่ ~/CLAUDE.md หัวข้อ Layer 3 · ทางเข้า NAS/Pi ใช้ skill home-network-rescue
 
 
 (ย้ายมาจาก `~/CLAUDE.md` หัวข้อ "3. app suda/" ตอนแยกโปรเจกต์ 2026-08-18)
